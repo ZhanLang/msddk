@@ -162,9 +162,12 @@ bool operator!=(const CKStringBase<T,AllocMem,FreeMem>& s1, const T *s2);
 typedef CKStringBase<char,StringBaseAlloc,StringBaseFree>   CKStringA;
 typedef CKStringBase<wchar_t,StringBaseAlloc,StringBaseFree>CKStringW;
 
-
-
-
+static inline UNICODE_STRING ToNtStr(LPCWSTR str)
+{
+	UNICODE_STRING UStr = { 0 };
+	RtlInitUnicodeString(&UStr, str);
+	return UStr;
+}
 
 
 /*-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_*/
