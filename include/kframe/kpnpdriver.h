@@ -3,16 +3,16 @@
 #include"driver.h"
 namespace msddk { ;
 template<class _DeviceClass, GUID *_pDeviceInterfaceGuid = NULL>
-class CKGenericPnpDriver : public CKDriver
+class CKPnpDriver : public CDriver
 {
 public:
 	_DeviceClass * m_pDevice;
-	CKGenericPnpDriver():CKDriver(true)
+	CKPnpDriver():CDriver(true)
 	{
 		m_pDevice = NULL;
 	}
 
-	virtual ~CKGenericPnpDriver()
+	virtual ~CKPnpDriver()
 	{
 		if (m_pDevice)
 		{
@@ -21,8 +21,10 @@ public:
 		}
 	}
 
-	virtual NTSTATUS AddDevice(IN PDEVICE_OBJECT  PhysicalDeviceObject) override
+	virtual NTSTATUS AddDevice(IN PDEVICE_OBJECT  PhysicalDeviceObject)
 	{
+		UNREFERENCED_PARAMETER(PhysicalDeviceObject);
+		KdPrint(("CKPnpDriver::AddDevice"));
 		if (m_pDevice && m_pDevice->Valid())
 			return STATUS_ALREADY_REGISTERED;
 
@@ -30,8 +32,8 @@ public:
 		if (!m_pDevice)
 			return STATUS_NO_MEMORY;
 
-		NTSTATUS st = m_pDevice->AddDevice(this, PhysicalDeviceObject, _pDeviceInterfaceGuid, NULL);
-		return st;
+		//NTSTATUS st = m_pDevice->AddDevice(this, PhysicalDeviceObject, _pDeviceInterfaceGuid, NULL);
+		return STATUS_SUCCESS;
 
 	}
 };

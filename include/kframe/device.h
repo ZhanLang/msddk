@@ -1,81 +1,52 @@
 #pragma once
 #include<util\kstring.h>
 namespace msddk { ;
-class CKDriver;
-class CKDevice
+class CDriver;
+class CDevice
 {
-	CKStringW m_DeviceName;
-	DEVICE_TYPE m_DeviceType;
-	bool m_bExclusive;
-	ULONG m_AdditionalDeviceFlags;
-	PDEVICE_OBJECT m_pDeviceObject;
-	PDEVICE_OBJECT m_pNextDevice;
-	PDEVICE_OBJECT m_pUnderlyingPDO;
-	UNICODE_STRING m_InterfaceName;
-	CKStringW m_LinkName;
-	ULONG m_DeviceCharacteristics;
 public:
-	CKDevice(DEVICE_TYPE DeviceType, const wchar_t *pwszDeviceName, ULONG DeviceCharacteristics, bool bExclusive,ULONG AdditionalDeviceFlags)
-	{
-		if (pwszDeviceName)
-			m_DeviceName = pwszDeviceName;
+	CDevice(
+		DEVICE_TYPE DeviceType,			/*设备类型*/
+		const wchar_t *pwszDeviceName,  /*设备名称*/
+		ULONG DeviceCharacteristics,	/*设备特征*/
+		bool bExclusive,				/*独占设备*/
+		ULONG AdditionalDeviceFlags		/*fdo->Flags*/
+	);
+	virtual ~CDevice();
 
-		m_DeviceCharacteristics = DeviceCharacteristics;
-		m_pNextDevice = NULL;
-		m_bExclusive = bExclusive;
-		m_pDeviceObject = NULL;
-		m_DeviceType = DeviceType;
-		m_pUnderlyingPDO = NULL;
-		m_AdditionalDeviceFlags = AdditionalDeviceFlags;
-	}
-	~CKDevice()
-	{}
+
+
 public:
+	bool Valid();
+	/*挂载到设备栈*/
+	NTSTATUS AttachToDeviceStack(PDEVICE_OBJECT DeviceObject);
+	NTSTATUS AttachToDevice(CKStringW DevicePath);
+	NTSTATUS RegisterInterface(IN CONST GUID *pGuid, IN PCUNICODE_STRING ReferenceString = NULL);
+
+	//创建设备
+	//内部调用IoCreateDevice
+	//pDriver:驱动对象
+	//bCompleteInitialization 创建完成后标记初始化
+	//pwszLinkPath 设备连接名称
+	NTSTATUS CreateDevice(CDriver *pDriver, bool bCompleteInitialization = true, const wchar_t *pwszLinkPath = NULL);
+	NTSTATUS DeleteDevice(bool FromIRPHandler);
+	NTSTATUS DetachDevice();
+	NTSTATUS EnableInterface();
+	NTSTATUS DisableInterface();
+	//标记设备完成初始化
+	//m_pDeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;
+	void CompleteInitialization();
+protected:
+	virtual LPCWSTR GetDeviceName();
+	virtual LPCWSTR GetDeviceLinkName();
+
+public://一下是私有函数，在框架中调用。
 	struct Extension
 	{
 		enum { DefaultSignature = 'VEDB' };
 		unsigned Signature;
-		CKDevice *pDevice;
+		CDevice *pDevice;
 	};
-
-
-
-public:
-	bool Valid()
-	{
-		return (m_pDeviceObject != NULL);
-	}
-
-	
-
-	NTSTATUS AttachToDeviceStack(PDEVICE_OBJECT DeviceObject)
-	{
-		if (!m_pDeviceObject)
-			return STATUS_INVALID_DEVICE_STATE;
-		if (!(m_pDeviceObject->Flags & DO_DEVICE_INITIALIZING))
-			return STATUS_INVALID_DEVICE_STATE;
-		if (m_pNextDevice)
-			return STATUS_ALREADY_REGISTERED;
-		m_pNextDevice = IoAttachDeviceToDeviceStack(m_pDeviceObject, DeviceObject);
-		if (!m_pNextDevice)
-			return STATUS_INVALID_DEVICE_STATE;
-		m_pUnderlyingPDO = DeviceObject;
-		return STATUS_SUCCESS;
-	}
-
-	NTSTATUS RegisterInterface(IN CONST GUID *pGuid, IN PCUNICODE_STRING ReferenceString = NULL)
-	{
-		if (!pGuid)
-			return STATUS_INVALID_PARAMETER;
-		if (!m_pUnderlyingPDO || m_InterfaceName.Buffer)
-			return STATUS_INVALID_DEVICE_STATE;
-		return IoRegisterDeviceInterface(m_pUnderlyingPDO, pGuid, (PUNICODE_STRING)ReferenceString, &m_InterfaceName);
-	}
-	virtual NTSTATUS AddDevice(CKDriver *pDriver, PDEVICE_OBJECT PhysicalDeviceObject, const GUID *pInterfaceGuid, const wchar_t *pwszLinkPath);
-
-	NTSTATUS RegisterDevice(CKDriver *pDriver, bool bCompleteInitialization = true, const wchar_t *pwszLinkPath = NULL);
-public://一下是私有函数，在框架中调用。
-
 
 	NTSTATUS ProcessIRP(IN PIRP  Irp, bool bIsPowerIrp)
 	{
@@ -88,7 +59,19 @@ private:
 
 
 private:
-	
+	CKStringW m_DeviceName;
+	DEVICE_TYPE m_DeviceType;
+	bool m_bExclusive;
+	bool m_bDeletePending;
+	bool m_bInterfaceEnabled;
+	ULONG m_AdditionalDeviceFlags;
+	PDEVICE_OBJECT m_pDeviceObject;
+	PDEVICE_OBJECT m_pNextDevice;
+	PDEVICE_OBJECT m_pUnderlyingPDO;
+	UNICODE_STRING m_InterfaceName;
+	CKStringW m_LinkName;
+	ULONG m_DeviceCharacteristics;
+	CDriver* m_pDriver;
 };
 
 };

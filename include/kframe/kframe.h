@@ -2,16 +2,17 @@
 
 #include"driver.h"
 #include"device.hpp"
+#include"driver.hpp"
 
 #define DRIVER_ENTRY(cls)\
-CKDriver* CKDriver::s_MainDriver = NULL;\
+CDriver* CDriver::s_MainDriver = NULL;\
 extern "C" NTSTATUS _stdcall DriverEntry(\
 	IN OUT PDRIVER_OBJECT   DriverObject,\
 	IN PUNICODE_STRING      RegistryPath\
 )\
 {\
-	CKDriver::s_MainDriver = new cls;\
-	return CKDriver::s_MainDriver->DriverEntry(DriverObject, RegistryPath);\
+	CDriver::s_MainDriver = new cls;\
+	return CDriver::s_MainDriver->DriverEntry(DriverObject, RegistryPath);\
 }
 
 namespace msddk { ;
@@ -21,7 +22,7 @@ template<class T>
 class CKFrame
 {
 public:
-	CKDriver* CreateMainDriverInstance()
+	CDriver* CreateMainDriverInstance()
 	{
 		return new T();
 	}
