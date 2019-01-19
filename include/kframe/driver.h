@@ -1,5 +1,5 @@
 #pragma once
-#include<util/kstring.h>
+#include<kutil/string.h>
 #include"device.h"
 
 namespace msddk { ;
@@ -24,6 +24,11 @@ protected:
 	//设备注册时通知
 	virtual void OnDeviceRegistered(const CDevice *pDevice);
 	virtual void OnDeviceUnregistered(const CDevice *pDevice);
+
+
+	virtual NTSTATUS OnAfterInit();
+	virtual NTSTATUS OnBeforeUnint();
+
 
 	//当有新设备插入时调用
 	virtual NTSTATUS AddDevice(IN PDEVICE_OBJECT  PhysicalDeviceObject);

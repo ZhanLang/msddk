@@ -56,22 +56,50 @@ NTSTATUS CDriver::DriverLoad(PUNICODE_STRING RegistryPath)
 
 NTSTATUS CDriver::DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 {
-	KdPrint(("DriverEntry\r"));
 	m_DriverObject = DriverObject;
 	m_RegistryPath = RegistryPath;
-	KdPrint(("RegistryPath:%ws\n", m_RegistryPath.GetBuffer()));
+	
+	NTSTATUS st = DriverLoad(RegistryPath);
+	if ( !NT_SUCCESS( st ) )
+	{
+		KdPrint(("CDriver::DriverEntry(): failed call to DriverLoad() (%wS)\n", MapNTStatus(st)));
+		return st;
+	}
 
-	return DriverLoad( RegistryPath);
+	st = OnAfterInit();
+	if ( !NT_SUCCESS( st ) )
+	{
+		KdPrint(("CDriver::DriverEntry(): failed call to OnAfterInit() (%wS)\n", MapNTStatus(st)));
+	}
+	return st;
+}
+
+NTSTATUS CDriver::OnAfterInit()
+{
+	KdPrint(("CDriver::OnAfterInit()"));
+	return STATUS_SUCCESS;
+}
+
+NTSTATUS CDriver::OnBeforeUnint()
+{
+	KdPrint(("CDriver::OnBeforeUnint()"));
+	return STATUS_SUCCESS;
 }
 
 VOID CDriver::sDriverUnload(IN PDRIVER_OBJECT DriverObject)
 {
 	UNREFERENCED_PARAMETER(DriverObject);
-	KdPrint(("sDriverUnload"));
+	if ( s_MainDriver )
+	{
+		NTSTATUS st = s_MainDriver->OnBeforeUnint();
+		if ( !NT_SUCCESS( st ) )
+		{
+			KdPrint(("Device::sDriverUnload(): failed call to OnBeforeUnint() (%wS)\n", MapNTStatus(st)));
+		}
 
-	if (s_MainDriver)
 		delete s_MainDriver;
-	s_MainDriver = NULL;
+		s_MainDriver = NULL;
+	}
 }
 
 NTSTATUS CDriver::sDispatch(IN PDEVICE_OBJECT  DeviceObject, IN PIRP  Irp)

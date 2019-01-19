@@ -22,26 +22,31 @@ public:
 	}
 
 protected:
-	virtual NTSTATUS DriverLoad(PUNICODE_STRING RegistryPath)
+	virtual NTSTATUS OnAfterInit()
 	{
-		NTSTATUS st =  __super::DriverLoad(RegistryPath);
-		if (!NT_SUCCESS(st))
-		{
-			KdPrint(("Device::DriverLoad(): failed call to __super::DriverLoad() (%d)\n", st));
-			return st;
-		}
 		m_Device = new DEV;
 		if (!m_Device)
 			return STATUS_NO_MEMORY;
 
 
-		st = m_Device->CreateDevice(this);
+		NTSTATUS st = m_Device->CreateDevice(this);
 		if (!NT_SUCCESS(st))
 			return st;
 
 		return STATUS_SUCCESS;
 	}
 
+	virtual NTSTATUS OnBeforeUnint()
+	{
+		if (m_Device)
+		{
+			KdPrint(("OnBeforeUnint"));
+			delete m_Device;
+			m_Device = NULL;
+		}
+
+		return STATUS_SUCCESS;
+	}
 };
 
 };

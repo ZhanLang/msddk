@@ -1,5 +1,6 @@
 #pragma once
-#include<util\kstring.h>
+#include<kutil\string.h>
+//#include "irp.h"
 namespace msddk { ;
 class CDriver;
 class CDevice
@@ -33,9 +34,16 @@ public:
 	NTSTATUS DetachDevice();
 	NTSTATUS EnableInterface();
 	NTSTATUS DisableInterface();
+
+
 	//标记设备完成初始化
 	//m_pDeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;
 	void CompleteInitialization();
+
+protected:
+	virtual NTSTATUS OnAfterCreate();
+	virtual NTSTATUS OnBeforeDelete();
+
 protected:
 	virtual LPCWSTR GetDeviceName();
 	virtual LPCWSTR GetDeviceLinkName();

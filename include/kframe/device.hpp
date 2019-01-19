@@ -1,6 +1,6 @@
 #pragma once
 #include"device.h"
-#include <util/kdbg.h>
+#include <kutil/dbg.h>
 namespace msddk { ;
 
 CDevice::CDevice(DEVICE_TYPE DeviceType,
@@ -109,7 +109,6 @@ NTSTATUS CDevice::CreateDevice(CDriver *pDriver, bool bCompleteInitialization/* 
 		st = IoCreateSymbolicLink(m_LinkName, FullDevicePath);
 		if (!NT_SUCCESS(st))
 		{
-			//KdPrint(("Device::CreateDevice(): failed call to IoCreateSymbolicLink() (%d)\n", st));
 			KdPrint(("Device::CreateDevice(): failed call to IoCreateSymbolicLink() (%wS)\n", MapNTStatus(st)));
 			m_LinkName.Empty();
 		}
@@ -119,6 +118,12 @@ NTSTATUS CDevice::CreateDevice(CDriver *pDriver, bool bCompleteInitialization/* 
 		CompleteInitialization();
 
 	m_pDriver = pDriver;
+	st = OnAfterCreate();
+	if ( !NT_SUCCESS(st) )
+	{
+		KdPrint(("Device::CreateDevice(): failed call to OnAfterCreate() (%wS)\n", MapNTStatus(st)));
+		return st;
+	}
 	pDriver->OnDeviceRegistered(this);
 	return STATUS_SUCCESS;
 }
@@ -127,6 +132,12 @@ NTSTATUS CDevice::DeleteDevice(bool FromIRPHandler)
 {
 	UNREFERENCED_PARAMETER(FromIRPHandler);
 	KdPrint(("CDevice::DeleteDevice"));
+	NTSTATUS st = OnBeforeDelete();
+	if ( !NT_SUCCESS(st) )
+	{
+		KdPrint(("Device::CreateDevice(): failed call to OnBeforeDelete() (%wS)\n", MapNTStatus(st)));
+	}
+
 	m_bDeletePending = true;
 	if (m_pDeviceObject)
 	{
@@ -230,6 +241,18 @@ NTSTATUS CDevice::AttachToDevice(CKStringW DevicePath)
 	if (!m_pNextDevice)
 		return STATUS_INVALID_DEVICE_STATE;
 	m_pUnderlyingPDO = m_pNextDevice;
+	return STATUS_SUCCESS;
+}
+
+NTSTATUS CDevice::OnAfterCreate()
+{
+	KdPrint(("CDevice::OnAfterCreate()"));
+	return STATUS_SUCCESS;
+}
+
+NTSTATUS CDevice::OnBeforeDelete()
+{
+	KdPrint(("CDevice::OnBeforeDelete()"));
 	return STATUS_SUCCESS;
 }
 
