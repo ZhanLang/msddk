@@ -80,4 +80,13 @@ static void _cdecl free(void *p)
 		KdPrint(("msddk::kmemory::free(null)\r"));
 	}
 }
+
+class NonPagedObject
+{
+public:
+	void *operator new(size_t size)
+	{
+		return npagednew(size);
+	}
+};
 };
