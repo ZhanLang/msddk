@@ -1,6 +1,6 @@
 #pragma once
 #include<kutil\string.h>
-//#include "irp.h"
+#include "irp.h"
 namespace msddk { ;
 class CDriver;
 class CDevice
@@ -56,13 +56,18 @@ public://一下是私有函数，在框架中调用。
 		CDevice *pDevice;
 	};
 
-	NTSTATUS ProcessIRP(IN PIRP  Irp, bool bIsPowerIrp)
-	{
-		UNREFERENCED_PARAMETER(Irp);
-		UNREFERENCED_PARAMETER(bIsPowerIrp);
-		return STATUS_SUCCESS;
-	}
+	NTSTATUS ProcessIRP(IN PIRP  Irp, bool bIsPowerIrp);
+	NTSTATUS PostProcessIRP(IncomingIrp *pIrp, NTSTATUS ProcessingStatus, bool FromDispatcherThread);
 
+protected:
+	virtual NTSTATUS __forceinline DispatchRoutine(IN IncomingIrp *Irp, IO_STACK_LOCATION *IrpSp);
+
+private:
+	NTSTATUS ForwardPacketToNextDriver(IN IncomingIrp *Irp);
+	NTSTATUS ForwardPacketToNextDriverWithIrpCompletion(IN IncomingIrp *Irp);
+
+protected:
+	static NTSTATUS IrpCompletingCompletionRoutine(IN PDEVICE_OBJECT  DeviceObject, IN PIRP Irp, IN PVOID Context);
 private:
 
 

@@ -166,6 +166,107 @@ NTSTATUS CDevice::DeleteDevice(bool FromIRPHandler)
 	return STATUS_SUCCESS;
 }
 
+NTSTATUS CDevice::ProcessIRP(IN PIRP  Irp, bool bIsPowerIrp)
+{
+	UNREFERENCED_PARAMETER(Irp);
+	UNREFERENCED_PARAMETER(bIsPowerIrp);
+
+	if (!m_pDeviceObject)
+		return STATUS_INVALID_DEVICE_STATE;
+
+	PIO_STACK_LOCATION IrpSp = IoGetCurrentIrpStackLocation(Irp);
+	IncomingIrp incomingIrp(Irp,
+		bIsPowerIrp,
+		bIsPowerIrp && ((IrpSp->MinorFunction == IRP_MN_QUERY_POWER) || (IrpSp->MinorFunction == IRP_MN_SET_POWER)));
+	
+	NTSTATUS st = DispatchRoutine(&incomingIrp, IoGetCurrentIrpStackLocation(Irp));
+	return PostProcessIRP(&incomingIrp, st, false);
+}
+
+NTSTATUS CDevice::PostProcessIRP(IncomingIrp *pIrp, NTSTATUS ProcessingStatus, bool FromDispatcherThread)
+{
+	if (ProcessingStatus == STATUS_PENDING)
+	{
+		ASSERT(pIrp->m_Flags & IncomingIrp::IrpMarkedPending);
+		return ProcessingStatus;
+	}
+
+	ASSERT(!(pIrp->m_Flags & IncomingIrp::IrpMarkedPending));
+	if (pIrp->m_Flags & (IncomingIrp::LowerDriverCalled | IncomingIrp::IrpCompleted))
+	{
+		if (!(pIrp->m_Flags & IncomingIrp::IrpCompleted))
+			pIrp->CompleteRequest();
+	}
+	else
+	{
+		if (FromDispatcherThread)
+		{
+			ProcessingStatus = ForwardPacketToNextDriverWithIrpCompletion(pIrp);
+			/*ProcessingStatus = CallNextDriverSynchronously(pIrp);
+			pIrp->CompleteRequest();*/
+		}
+		else
+			ProcessingStatus = ForwardPacketToNextDriver(pIrp);
+	}
+
+	return ProcessingStatus;
+}
+
+
+NTSTATUS CDevice::ForwardPacketToNextDriver(IN IncomingIrp *Irp)
+{
+	if (!m_pNextDevice)
+	{
+		NTSTATUS st = Irp->m_pIrp->IoStatus.Status;
+		Irp->CompleteRequest();
+		return st;
+	}
+	else
+	{
+		InterlockedOr(&Irp->m_Flags, IncomingIrp::LowerDriverCalled);
+		if (Irp->m_Flags & IncomingIrp::StartNextPowerIrp)
+			PoStartNextPowerIrp(Irp->m_pIrp);
+		IoSkipCurrentIrpStackLocation(Irp->m_pIrp);
+		if (Irp->m_Flags & IncomingIrp::IsPowerIrp)
+			return PoCallDriver(m_pNextDevice, Irp->m_pIrp);
+		else
+			return IoCallDriver(m_pNextDevice, Irp->m_pIrp);
+	}
+}
+
+NTSTATUS CDevice::IrpCompletingCompletionRoutine(IN PDEVICE_OBJECT  DeviceObject, IN PIRP pIrp, IN PVOID Context)
+{
+	UNREFERENCED_PARAMETER(DeviceObject);
+	UNREFERENCED_PARAMETER(Context);
+	IoCompleteRequest(pIrp, IO_NO_INCREMENT);
+	return STATUS_SUCCESS;
+}
+
+NTSTATUS CDevice::ForwardPacketToNextDriverWithIrpCompletion(IN IncomingIrp *Irp)
+{
+	NTSTATUS status;
+
+	if (!m_pNextDevice)
+		return STATUS_INVALID_DEVICE_REQUEST;
+
+	InterlockedOr(&Irp->m_Flags, IncomingIrp::LowerDriverCalled);
+	IoCopyCurrentIrpStackLocationToNext(Irp->m_pIrp);
+	IoSetCompletionRoutine(Irp->m_pIrp, IrpCompletingCompletionRoutine,
+		NULL, TRUE, TRUE, TRUE);
+
+	if (Irp->m_Flags & IncomingIrp::IsPowerIrp)
+		status = PoCallDriver(m_pNextDevice, Irp->m_pIrp);
+	else
+		status = IoCallDriver(m_pNextDevice, Irp->m_pIrp);
+	return status;
+}
+
+NTSTATUS __forceinline CDevice::DispatchRoutine(IN IncomingIrp *Irp, IO_STACK_LOCATION *IrpSp)
+{ 
+	UNREFERENCED_PARAMETER(IrpSp);
+	return Irp->GetStatus(); 
+}
+
 NTSTATUS CDevice::DetachDevice()
 {
 	if (!m_pDeviceObject)
@@ -255,6 +356,7 @@ NTSTATUS CDevice::OnBeforeDelete()
 	KdPrint(("CDevice::OnBeforeDelete()"));
 	return STATUS_SUCCESS;
 }
+
 
 LPCWSTR CDevice::GetDeviceName()
 {

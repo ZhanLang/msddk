@@ -20,7 +20,8 @@ public:
 	}
 
 private:
-	template <class _MemberClass, typename _MemberType> int MemberInvoker()
+	template <class _MemberClass, typename _MemberType> 
+	int MemberInvoker()
 	{
 		_MemberType pMember;
 		C_ASSERT(sizeof(pMember) <= sizeof(m_pThreadProc));
@@ -30,14 +31,14 @@ private:
 
 public:
 	template <class _MemberClass, typename _MemberType> 
-	MemberThread(_MemberClass *pClass, _MemberType pProc)
+	CKeMemberThread(_MemberClass *pClass, _MemberType pProc)
 		: m_pClass(pClass)
 	{
 		ASSERT(pProc);
 		C_ASSERT(sizeof(_MemberType) <= sizeof(m_pThreadProc));
 		memcpy(m_pThreadProc, &pProc, sizeof(_MemberType));
 
-		m_pMemberInvoker = &MemberThread::MemberInvoker<_MemberClass, _MemberType>;
+		m_pMemberInvoker = &CKeMemberThread::MemberInvoker<_MemberClass, _MemberType>;
 	}
 };
 
