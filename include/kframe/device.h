@@ -21,7 +21,7 @@ public:
 	bool Valid();
 	/*挂载到设备栈*/
 	NTSTATUS AttachToDeviceStack(PDEVICE_OBJECT DeviceObject);
-	NTSTATUS AttachToDevice(CKStringW DevicePath);
+	NTSTATUS AttachToDevice(CKeStringW DevicePath);
 	NTSTATUS RegisterInterface(IN CONST GUID *pGuid, IN PCUNICODE_STRING ReferenceString = NULL);
 
 	//创建设备
@@ -67,7 +67,7 @@ private:
 
 
 private:
-	CKStringW m_DeviceName;
+	CKeStringW m_DeviceName;
 	DEVICE_TYPE m_DeviceType;
 	bool m_bExclusive;
 	bool m_bDeletePending;
@@ -77,7 +77,7 @@ private:
 	PDEVICE_OBJECT m_pNextDevice;
 	PDEVICE_OBJECT m_pUnderlyingPDO;
 	UNICODE_STRING m_InterfaceName;
-	CKStringW m_LinkName;
+	CKeStringW m_LinkName;
 	ULONG m_DeviceCharacteristics;
 	CDriver* m_pDriver;
 };

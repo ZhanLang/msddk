@@ -5,14 +5,14 @@ namespace msddk{;
 
 
 template<class KEY, class TYPE> 
-class CKMapNode
+class CKeMapNode
 {
 public:
 	TYPE    Value;
 	KEY	    Key;
 
 public:
-	typedef CKMapNode<KEY,TYPE> Node;
+	typedef CKeMapNode<KEY,TYPE> Node;
 	enum  NodeColor {RED,BLACK};
 	Node *  Parent;
 	Node *  RightChild;
@@ -23,13 +23,13 @@ public:
 };
 
 template<class KEY, class TYPE> 
-class CKMapIterator								//为了支持对map进行按升序或降序遍历
+class CKeMapIterator								//为了支持对map进行按升序或降序遍历
 {
 public:
-	typedef CKMapNode<KEY,TYPE> Node;
+	typedef CKeMapNode<KEY,TYPE> Node;
 	Node * pRBT_Node;
-	CKMapIterator(){pRBT_Node=NULL;};
-	CKMapIterator(Node* pNode){pRBT_Node=pNode;};
+	CKeMapIterator(){pRBT_Node=NULL;};
+	CKeMapIterator(Node* pNode){pRBT_Node=pNode;};
 	void Increment();
 	void Decrement();
 	void operator++(int){ Increment();}				//向更大的KEY
@@ -41,7 +41,7 @@ public:
 
 
 template<typename KEY>
-struct CKMapNodLess
+struct CKeMapNodLess
 {
 	bool operator ()(const KEY& l , const KEY& r) const
 	{
@@ -49,18 +49,18 @@ struct CKMapNodLess
 	}
 };
 
-template<class KEY, class TYPE, class _CMP = CKMapNodLess<KEY>> 
-class CKMap
+template<class KEY, class TYPE, class _CMP = CKeMapNodLess<KEY>> 
+class CKeMap
 {
 public:
-	typedef CKMapIterator<KEY,TYPE> Iterator;
-	typedef CKMapNode<KEY,TYPE>*     ValueType;
-	typedef CKMapNode<KEY,TYPE> Node;
+	typedef CKeMapIterator<KEY,TYPE> Iterator;
+	typedef CKeMapNode<KEY,TYPE>*     ValueType;
+	typedef CKeMapNode<KEY,TYPE> Node;
 	inline unsigned int Count();
 	
-	CKMap();
-	~CKMap();
-	CKMap(const CKMap &v);
+	CKeMap();
+	~CKeMap();
+	CKeMap(const CKeMap &v);
 	VOID  Clear();
 	BOOL  Insert(const KEY& Key, const TYPE& Value);
 	BOOL  Remove(const KEY& Key);
@@ -68,7 +68,7 @@ public:
 	Node* Min() const;						  //返回最小Key节点,以便使用TRB_TreeIter 进行遍历
 	Node* Max() const;						  //返回最大Key节点,以便使用TRB_TreeIter 进行遍历
 
-	CKMap& operator= (const CKMap& t);
+	CKeMap& operator= (const CKeMap& t);
 private:
 	VOID  DeleteFixUp(Node *TreeNode);	  //删除后的树平衡
 	VOID  DeleteTree(Node * TreeNode);	  //删除指定的树
@@ -81,22 +81,22 @@ private:
 };
 /*_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-*/
 /*使用方式
-CKMap<CApiString, CApiString> strMap;
+CKeMap<CApiString, CApiString> strMap;
 strMap.Insert(_T("5"), _T("hello"));
 strMap.Insert(_T("4"), _T("mpimap"));
 
 //遍历
-CKMap<CApiString,CApiString>::Iterator it = strMap.Min();
+CKeMap<CApiString,CApiString>::Iterator it = strMap.Min();
 for (; it ; it++)
 {
 }
 
 //查找
-CKMap<CApiString,CApiString>::ValueType value = strMap.Find(_T("2"));
+CKeMap<CApiString,CApiString>::ValueType value = strMap.Find(_T("2"));
 */
 /*_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-*/
 template<class KEY, class TYPE> 
-void CKMapIterator<KEY,TYPE>::Increment()			
+void CKeMapIterator<KEY,TYPE>::Increment()			
 {
 	if(pRBT_Node==NULL)
 		return;
@@ -124,7 +124,7 @@ void CKMapIterator<KEY,TYPE>::Increment()
 }
 
 template<class KEY, class TYPE> 
-void CKMapIterator<KEY,TYPE>::Decrement()
+void CKeMapIterator<KEY,TYPE>::Decrement()
 {
 	if(pRBT_Node==NULL)
 		return;
@@ -153,7 +153,7 @@ void CKMapIterator<KEY,TYPE>::Decrement()
 
 /*_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-*/
 template<class KEY, class TYPE, class _CMP> 
-CKMapNode<KEY,TYPE>*  CKMap<KEY,TYPE,_CMP>::Min() const
+CKeMapNode<KEY,TYPE>*  CKeMap<KEY,TYPE,_CMP>::Min() const
 {
 	Node* pResult=m_Head;
 	if(!pResult->IsSnil)
@@ -168,7 +168,7 @@ CKMapNode<KEY,TYPE>*  CKMap<KEY,TYPE,_CMP>::Min() const
 }
 
 template<class KEY, class TYPE, class _CMP> 
-CKMapNode<KEY,TYPE>*  CKMap<KEY,TYPE,_CMP>::Max() const 
+CKeMapNode<KEY,TYPE>*  CKeMap<KEY,TYPE,_CMP>::Max() const 
 {
 	Node* pResult=m_Head;
 	if(!pResult->IsSnil)
@@ -183,7 +183,7 @@ CKMapNode<KEY,TYPE>*  CKMap<KEY,TYPE,_CMP>::Max() const
 }
 
 template<class KEY, class TYPE, class _CMP> 
-CKMapNode<KEY,TYPE>*  CKMap<KEY,TYPE,_CMP>::Find(const KEY& Key)
+CKeMapNode<KEY,TYPE>*  CKeMap<KEY,TYPE,_CMP>::Find(const KEY& Key)
 {
 	Node* pResult=m_Head;
 	while(!pResult->IsSnil)
@@ -204,7 +204,7 @@ CKMapNode<KEY,TYPE>*  CKMap<KEY,TYPE,_CMP>::Find(const KEY& Key)
 }
 
 template<class KEY, class TYPE, class _CMP> 
-BOOL  CKMap<KEY,TYPE,_CMP>::Insert(const KEY& Key, const TYPE& Value)
+BOOL  CKeMap<KEY,TYPE,_CMP>::Insert(const KEY& Key, const TYPE& Value)
 {
 	Node * TreeNode,*InsertPoint,*NewNode;
 	TreeNode=m_Head;
@@ -298,7 +298,7 @@ BOOL  CKMap<KEY,TYPE,_CMP>::Insert(const KEY& Key, const TYPE& Value)
 }
 
 template<class KEY, class TYPE, class _CMP> 
-CKMap<KEY,TYPE,_CMP>::CKMap()
+CKeMap<KEY,TYPE,_CMP>::CKeMap()
 {
 	m_Snil.IsSnil=TRUE;
 	m_Snil.LelfChild=NULL;
@@ -308,7 +308,7 @@ CKMap<KEY,TYPE,_CMP>::CKMap()
 };
 
 template<class KEY, class TYPE, class _CMP> 
-CKMap<KEY,TYPE,_CMP>::CKMap(const CKMap<KEY,TYPE,_CMP>& t)
+CKeMap<KEY,TYPE,_CMP>::CKeMap(const CKeMap<KEY,TYPE,_CMP>& t)
 {
 	m_Snil.IsSnil		=TRUE;
 	m_Snil.LelfChild	=NULL;
@@ -321,13 +321,13 @@ CKMap<KEY,TYPE,_CMP>::CKMap(const CKMap<KEY,TYPE,_CMP>& t)
 }
 
 template<class KEY, class TYPE, class _CMP> 
-CKMap<KEY,TYPE,_CMP>::~CKMap()
+CKeMap<KEY,TYPE,_CMP>::~CKeMap()
 {
 	Clear();
 };
 
 template<class KEY, class TYPE, class _CMP> 
-BOOL CKMap<KEY,TYPE,_CMP>::Remove(const KEY& Key)
+BOOL CKeMap<KEY,TYPE,_CMP>::Remove(const KEY& Key)
 {
 	Node * DeleteNode,*TreeNode,*R;
 	DeleteNode=m_Head;
@@ -385,7 +385,7 @@ BOOL CKMap<KEY,TYPE,_CMP>::Remove(const KEY& Key)
 
 
 template<class KEY, class TYPE, class _CMP> 
-VOID CKMap<KEY,TYPE,_CMP>::DeleteTree(Node *TreeNode)
+VOID CKeMap<KEY,TYPE,_CMP>::DeleteTree(Node *TreeNode)
 {
 	if(TreeNode->IsSnil)
 		return ;
@@ -400,7 +400,7 @@ VOID CKMap<KEY,TYPE,_CMP>::DeleteTree(Node *TreeNode)
 }
 
 template<class KEY, class TYPE, class _CMP> 
-VOID CKMap<KEY,TYPE,_CMP>::LeftRotate(Node * TreeNode)
+VOID CKeMap<KEY,TYPE,_CMP>::LeftRotate(Node * TreeNode)
 {
 	Node * Rotate_Right;
 	Rotate_Right=TreeNode->RightChild;
@@ -423,7 +423,7 @@ VOID CKMap<KEY,TYPE,_CMP>::LeftRotate(Node * TreeNode)
 }
 
 template<class KEY, class TYPE, class _CMP> 
-VOID CKMap<KEY,TYPE,_CMP>::RightRotate(Node * TreeNode)
+VOID CKeMap<KEY,TYPE,_CMP>::RightRotate(Node * TreeNode)
 {
 	Node * Rotate_Left;
 	Rotate_Left=TreeNode->LelfChild;
@@ -445,7 +445,7 @@ VOID CKMap<KEY,TYPE,_CMP>::RightRotate(Node * TreeNode)
 }
 
 template<class KEY, class TYPE, class _CMP> 
-VOID CKMap<KEY,TYPE,_CMP>::DeleteFixUp(Node * TreeNode)
+VOID CKeMap<KEY,TYPE,_CMP>::DeleteFixUp(Node * TreeNode)
 {
 	Node * Brother;
 	while(TreeNode!=m_Head&&TreeNode->Color==Node::BLACK)
@@ -523,7 +523,7 @@ VOID CKMap<KEY,TYPE,_CMP>::DeleteFixUp(Node * TreeNode)
 }
 
 template<class KEY, class TYPE, class _CMP> 
-VOID CKMap<KEY,TYPE,_CMP>::Clear()
+VOID CKeMap<KEY,TYPE,_CMP>::Clear()
 {
 	DeleteTree(m_Head);
 	m_Head=&m_Snil;
@@ -531,16 +531,16 @@ VOID CKMap<KEY,TYPE,_CMP>::Clear()
 }
 
 template<class KEY, class TYPE, class _CMP> 
-inline UINT CKMap<KEY,TYPE,_CMP>::Count()
+inline UINT CKeMap<KEY,TYPE,_CMP>::Count()
 {
 	return m_Count;
 }
 
 template<class KEY, class TYPE, class _CMP> 
-CKMap<KEY,TYPE,_CMP>& CKMap<KEY,TYPE,_CMP>::operator= (const CKMap<KEY,TYPE,_CMP>& t)
+CKeMap<KEY,TYPE,_CMP>& CKeMap<KEY,TYPE,_CMP>::operator= (const CKeMap<KEY,TYPE,_CMP>& t)
 {
 	Clear();
-	CKMap<KEY,TYPE,_CMP>::Iterator it = t.Min();
+	CKeMap<KEY,TYPE,_CMP>::Iterator it = t.Min();
 	for (; it; it++)
 	{
 		Insert(KEY(it->Key),TYPE(it->Value));

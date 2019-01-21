@@ -182,7 +182,7 @@ namespace BazisLib
 		private:
 			PIRP m_pIrp;
 			bool m_bSynchronous;
-			KEvent m_Event;
+			CKeEvent m_Event;
 			IO_STATUS_BLOCK m_StatusBlock;
 			PIO_STACK_LOCATION m_pSp;
 			PDEVICE_OBJECT m_pDevObj;

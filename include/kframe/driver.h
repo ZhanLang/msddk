@@ -8,7 +8,7 @@ class CDriver
 {
 protected:
 	PDRIVER_OBJECT m_DriverObject;
-	CKStringW m_RegistryPath;
+	CKeStringW m_RegistryPath;
 	bool m_bRegisterAddDevice;
 
 public:

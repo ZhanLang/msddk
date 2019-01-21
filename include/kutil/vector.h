@@ -2,11 +2,11 @@
 namespace msddk{;
 
 template<class T>
-class CVectorBaseImp
+class CKeVectorBaseImp
 {
 public:
-	CVectorBaseImp(size_t itemSize);
-	virtual ~CVectorBaseImp();
+	CKeVectorBaseImp(size_t itemSize);
+	virtual ~CKeVectorBaseImp();
 	void ClearAndFree();
 	int Size() const ;
 	bool IsEmpty() const ;
@@ -35,13 +35,13 @@ private:
 
 
 template<typename T>
-class  CVectorBase: public CVectorBaseImp<T>
+class  CKeVectorBase: public CKeVectorBaseImp<T>
 {
 public:
-	CVectorBase();
-	CVectorBase(const CVectorBase &v);
-	CVectorBase& operator=(const CVectorBase &v);
-	CVectorBase& operator+=(const CVectorBase &v);
+	CKeVectorBase();
+	CKeVectorBase(const CKeVectorBase &v);
+	CKeVectorBase& operator=(const CKeVectorBase &v);
+	CKeVectorBase& operator+=(const CKeVectorBase &v);
 	int Add(T item);
 	void Insert(int index, T item);
 	const T& operator[](int index) const ;
@@ -59,14 +59,14 @@ public:
 };
 
 template <class T>
-class CKVector: public CVectorBase<void*>
+class CKeVector: public CKeVectorBase<void*>
 {
 public:
-	CKVector() ;
-	~CKVector() ;
-	CKVector(const CKVector &v);
-	CKVector& operator=(const CKVector &v);
-	CKVector& operator+=(const CKVector &v);
+	CKeVector() ;
+	~CKeVector() ;
+	CKeVector(const CKeVector &v);
+	CKeVector& operator=(const CKeVector &v);
+	CKeVector& operator+=(const CKeVector &v);
 	const T& operator[](int index) const ;
 	T& operator[](int index) ;
 	T& Front() ;
@@ -90,7 +90,7 @@ private:
 
 /*_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-*/
 template<typename T>
-CVectorBaseImp<T>::CVectorBaseImp(size_t itemSize)
+CKeVectorBaseImp<T>::CKeVectorBaseImp(size_t itemSize)
 	: _capacity(0)
 	, _size(0)
 	, _items(0)
@@ -100,13 +100,13 @@ CVectorBaseImp<T>::CVectorBaseImp(size_t itemSize)
 }
 
 template<typename T>
-CVectorBaseImp<T>::~CVectorBaseImp()
+CKeVectorBaseImp<T>::~CKeVectorBaseImp()
 {
 	ClearAndFree();
 }
 
 template<typename T>
-void CVectorBaseImp<T>::ClearAndFree()
+void CKeVectorBaseImp<T>::ClearAndFree()
 {
 	Clear();
 	delete []((unsigned char *)_items);
@@ -116,19 +116,19 @@ void CVectorBaseImp<T>::ClearAndFree()
 }
 
 template<typename T>
-int CVectorBaseImp<T>::Size() const 
+int CKeVectorBaseImp<T>::Size() const 
 {
 	return _size;
 }
 
 template<typename T>
-bool CVectorBaseImp<T>::IsEmpty() const 
+bool CKeVectorBaseImp<T>::IsEmpty() const 
 { 
 	return (_size == 0); 
 }
 
 template<typename T>
-bool CVectorBaseImp<T>::Reserve(int newCapacity)
+bool CKeVectorBaseImp<T>::Reserve(int newCapacity)
 {
 	if (newCapacity == _capacity)
 		return true;
@@ -158,13 +158,13 @@ bool CVectorBaseImp<T>::Reserve(int newCapacity)
 }
 
 template<typename T>
-void CVectorBaseImp<T>::ReserveDown()
+void CKeVectorBaseImp<T>::ReserveDown()
 {
 	Reserve(_size);
 }
 
 template<typename T>
-void CVectorBaseImp<T>::Delete(int index, int num /*= 1*/)
+void CKeVectorBaseImp<T>::Delete(int index, int num /*= 1*/)
 {
 	TestIndexAndCorrectNum(index, num);
 	if (num > 0)
@@ -175,25 +175,25 @@ void CVectorBaseImp<T>::Delete(int index, int num /*= 1*/)
 }
 
 template<typename T>
-void CVectorBaseImp<T>::Clear()
+void CKeVectorBaseImp<T>::Clear()
 {
 	DeleteFrom(0);
 }
 
 template<typename T>
-void CVectorBaseImp<T>::DeleteFrom(int index)
+void CKeVectorBaseImp<T>::DeleteFrom(int index)
 {
 	Delete(index, _size - index);
 }
 
 template<typename T>
-void CVectorBaseImp<T>::DeleteBack()
+void CKeVectorBaseImp<T>::DeleteBack()
 {
 	Delete(_size - 1);
 }
 
 template<typename T>
-void CVectorBaseImp<T>::ReserveOnePosition()
+void CKeVectorBaseImp<T>::ReserveOnePosition()
 {
 	if (_size != _capacity)
 		return;
@@ -206,7 +206,7 @@ void CVectorBaseImp<T>::ReserveOnePosition()
 }
 
 template<typename T>
-void CVectorBaseImp<T>::InsertOneItem(int index)
+void CKeVectorBaseImp<T>::InsertOneItem(int index)
 {
 	ReserveOnePosition();
 	MoveItems(index + 1, index);
@@ -214,7 +214,7 @@ void CVectorBaseImp<T>::InsertOneItem(int index)
 }
 
 template<typename T>
-void CVectorBaseImp<T>::TestIndexAndCorrectNum(int index, int &num) const
+void CKeVectorBaseImp<T>::TestIndexAndCorrectNum(int index, int &num) const
 { 
 	if (index + num > _size) 
 		num = _size - index; 
@@ -222,7 +222,7 @@ void CVectorBaseImp<T>::TestIndexAndCorrectNum(int index, int &num) const
 
 
 template<typename T>
-void CVectorBaseImp<T>::MoveItems(int destIndex, int srcIndex)
+void CKeVectorBaseImp<T>::MoveItems(int destIndex, int srcIndex)
 {
 	memmove(((unsigned char *)_items) + destIndex * _itemSize,
 		((unsigned char  *)_items) + srcIndex * _itemSize,
@@ -232,28 +232,28 @@ void CVectorBaseImp<T>::MoveItems(int destIndex, int srcIndex)
 
 
 template<typename T>
-CVectorBase<T>::CVectorBase()
-	: CVectorBaseImp(sizeof(T))
+CKeVectorBase<T>::CKeVectorBase()
+	: CKeVectorBaseImp(sizeof(T))
 {
 
 };
 
 template<typename T>
-CVectorBase<T>::CVectorBase(const CVectorBase &v)
-	: CVectorBaseImp(sizeof(T)) 
+CKeVectorBase<T>::CKeVectorBase(const CKeVectorBase &v)
+	: CKeVectorBaseImp(sizeof(T)) 
 { 
 	*this = v; 
 }
 
 template<typename T>
-CVectorBase<T>& CVectorBase<T>::operator=(const CVectorBase &v)
+CKeVectorBase<T>& CKeVectorBase<T>::operator=(const CKeVectorBase &v)
 {
 	Clear();
 	return (*this += v);
 }
 
 template<typename T>
-CVectorBase<T>& CVectorBase<T>::operator+=(const CVectorBase &v)
+CKeVectorBase<T>& CKeVectorBase<T>::operator+=(const CKeVectorBase &v)
 {
 	int size = v.Size();
 	Reserve(Size() + size);
@@ -263,7 +263,7 @@ CVectorBase<T>& CVectorBase<T>::operator+=(const CVectorBase &v)
 }
 
 template<typename T>
-int CVectorBase<T>::Add(T item)
+int CKeVectorBase<T>::Add(T item)
 {
 	ReserveOnePosition();
 	((T *)_items)[_size] = item;
@@ -271,50 +271,50 @@ int CVectorBase<T>::Add(T item)
 }
 
 template<typename T>
-void CVectorBase<T>::Insert(int index, T item)
+void CKeVectorBase<T>::Insert(int index, T item)
 {
 	InsertOneItem(index);
 	((T *)_items)[index] = item;
 }
 
 template<typename T>
-const T& CVectorBase<T>::operator[](int index) const 
+const T& CKeVectorBase<T>::operator[](int index) const 
 {
 	return ((T *)_items)[index]; 
 }
 
 template<typename T>
-T& CVectorBase<T>::operator[](int index) 
+T& CKeVectorBase<T>::operator[](int index) 
 {
 	return ((T *)_items)[index]; 
 }
 
 template<typename T>
-const T& CVectorBase<T>::Front() const 
+const T& CKeVectorBase<T>::Front() const 
 {
 	return operator[](0); 
 }
 
 template<typename T>
-T& CVectorBase<T>::Front() 
+T& CKeVectorBase<T>::Front() 
 {
 	return operator[](0); 
 }
 
 template<typename T>
-const T& CVectorBase<T>::Back() const 
+const T& CKeVectorBase<T>::Back() const 
 {
 	return operator[](_size - 1); 
 }
 
 template<typename T>
-T& CVectorBase<T>::Back() 
+T& CKeVectorBase<T>::Back() 
 {
 	return operator[](_size - 1); 
 }
 
 template<typename T>
-void CVectorBase<T>::Swap(int i, int j)
+void CKeVectorBase<T>::Swap(int i, int j)
 {
 	T temp = operator[](i);
 	operator[](i) = operator[](j);
@@ -322,7 +322,7 @@ void CVectorBase<T>::Swap(int i, int j)
 }
 
 template<typename T>
-int CVectorBase<T>::FindInSorted(const T& item, int left, int right) const
+int CKeVectorBase<T>::FindInSorted(const T& item, int left, int right) const
 {
 	while (left != right)
 	{
@@ -339,7 +339,7 @@ int CVectorBase<T>::FindInSorted(const T& item, int left, int right) const
 }
 
 template<typename T>
-int CVectorBase<T>::FindInSorted(const T& item) const
+int CKeVectorBase<T>::FindInSorted(const T& item) const
 {
 	int left = 0, right = Size();
 	while (left != right)
@@ -357,7 +357,7 @@ int CVectorBase<T>::FindInSorted(const T& item) const
 }
 
 template<typename T>
-int CVectorBase<T>::AddToUniqueSorted(const T& item)
+int CKeVectorBase<T>::AddToUniqueSorted(const T& item)
 {
 	int left = 0, right = Size();
 	while (left != right)
@@ -376,7 +376,7 @@ int CVectorBase<T>::AddToUniqueSorted(const T& item)
 }
 
 template<typename T>
-static void CVectorBase<T>::SortRefDown(T* p, int k, int size, int (*compare)(const T*, const T*, void *), void *param)
+static void CKeVectorBase<T>::SortRefDown(T* p, int k, int size, int (*compare)(const T*, const T*, void *), void *param)
 {
 	T temp = p[k];
 	for (;;)
@@ -395,7 +395,7 @@ static void CVectorBase<T>::SortRefDown(T* p, int k, int size, int (*compare)(co
 }
 
 template<typename T>
-void CVectorBase<T>::Sort(int (*compare)(const T*, const T*, void *), void *param)
+void CKeVectorBase<T>::Sort(int (*compare)(const T*, const T*, void *), void *param)
 {
 	int size = _size;
 	if (size <= 1)
@@ -419,36 +419,36 @@ void CVectorBase<T>::Sort(int (*compare)(const T*, const T*, void *), void *para
 
 
 template <class T>
-CKVector<T>::CKVector() 
+CKeVector<T>::CKeVector() 
 {
 
 }
 
 
 template <class T>
-CKVector<T>::~CKVector() 
+CKeVector<T>::~CKeVector() 
 { 
 	Clear(); 
 };
 
 
 template <class T>
-CKVector<T>::CKVector(const CKVector &v)
-	: CVectorBase<void*>() 
+CKeVector<T>::CKeVector(const CKeVector &v)
+	: CKeVectorBase<void*>() 
 { 
 	*this = v; 
 }
 
 
 template <class T> 
-CKVector<T>& CKVector<T>::operator=(const CKVector &v)
+CKeVector<T>& CKeVector<T>::operator=(const CKeVector &v)
 {
 	Clear();
 	return (*this += v);
 }
 
 template <class T> 
-CKVector<T>& CKVector<T>::operator+=(const CKVector &v)
+CKeVector<T>& CKeVector<T>::operator+=(const CKeVector &v)
 {
 	int size = v.Size();
 	Reserve(Size() + size);
@@ -458,64 +458,64 @@ CKVector<T>& CKVector<T>::operator+=(const CKVector &v)
 }
 
 template <class T> 
-const T& CKVector<T>::operator[](int index) const 
+const T& CKeVector<T>::operator[](int index) const 
 {
-	return *((T *)CVectorBase<void*>::operator[](index)); 
+	return *((T *)CKeVectorBase<void*>::operator[](index)); 
 }
 
 template <class T> 
-T& CKVector<T>::operator[](int index) 
+T& CKeVector<T>::operator[](int index) 
 {
-	return *((T *)CVectorBase<void*>::operator[](index)); 
+	return *((T *)CKeVectorBase<void*>::operator[](index)); 
 }
 
 template <class T> 
-T& CKVector<T>::Front() 
-{
-	return operator[](0); 
-}
-
-template <class T> 
-const T& CKVector<T>::Front() const 
+T& CKeVector<T>::Front() 
 {
 	return operator[](0); 
 }
 
 template <class T> 
-T& CKVector<T>::Back() 
+const T& CKeVector<T>::Front() const 
+{
+	return operator[](0); 
+}
+
+template <class T> 
+T& CKeVector<T>::Back() 
 {
 	return operator[](_size - 1); 
 }
 
 template <class T> 
-const T& CKVector<T>::Back() const 
+const T& CKeVector<T>::Back() const 
 {
 	return operator[](_size - 1); 
 }
 
 template <class T> 
-int CKVector<T>::Add(const T& item) 
+int CKeVector<T>::Add(const T& item) 
 {
-	return CVectorBase<void*>::Add(new T(item)); 
+	return CKeVectorBase<void*>::Add(new T(item)); 
 }
 
 template <class T> 
-void CKVector<T>::Insert(int index, const T& item) 
+void CKeVector<T>::Insert(int index, const T& item) 
 {
-	CVectorBase<void*>::Insert(index, new T(item)); 
+	CKeVectorBase<void*>::Insert(index, new T(item)); 
 }
 
 template <class T> 
-void CKVector<T>::Delete(int index, int num /*= 1*/)
+void CKeVector<T>::Delete(int index, int num /*= 1*/)
 {
 	TestIndexAndCorrectNum(index, num);
 	for (int i = 0; i < num; i++)
 		delete (T *)(((void **)_items)[index + i]);
-	CVectorBase<void*>::Delete(index, num);
+	CKeVectorBase<void*>::Delete(index, num);
 }
 
 template <class T> 
-int CKVector<T>::Find(const T& item) const
+int CKeVector<T>::Find(const T& item) const
 {
 	for (int i = 0; i < Size(); i++)
 		if (item == (*this)[i])
@@ -524,7 +524,7 @@ int CKVector<T>::Find(const T& item) const
 }
 
 template <class T> 
-int CKVector<T>::FindInSorted(const T& item) const
+int CKeVector<T>::FindInSorted(const T& item) const
 {
 	int left = 0, right = Size();
 	while (left != right)
@@ -542,7 +542,7 @@ int CKVector<T>::FindInSorted(const T& item) const
 }
 
 template <class T> 
-int CKVector<T>::AddToSorted(const T& item)
+int CKeVector<T>::AddToSorted(const T& item)
 {
 	int left = 0, right = Size();
 	while (left != right)
@@ -564,26 +564,26 @@ int CKVector<T>::AddToSorted(const T& item)
 }
 
 template <class T> 
-void CKVector<T>::Sort(int (*compare)(void *const *, void *const *, void *), void *param)
+void CKeVector<T>::Sort(int (*compare)(void *const *, void *const *, void *), void *param)
 {
-	CVectorBase<void*>::Sort(compare, param); 
+	CKeVectorBase<void*>::Sort(compare, param); 
 }
 
 template <class T> 
-static int CKVector<T>::CompareObjectItems(void *const *a1, void *const *a2, void * /* param */)
+static int CKeVector<T>::CompareObjectItems(void *const *a1, void *const *a2, void * /* param */)
 {
 	return Compare(*(*((const T **)a1)), *(*((const T **)a2))); 
 }
 
 template <class T> 
-void CKVector<T>::Sort() 
+void CKeVector<T>::Sort() 
 {
-	CVectorBase<void*>::Sort(CompareObjectItems, 0); 
+	CKeVectorBase<void*>::Sort(CompareObjectItems, 0); 
 }
 
 
 template <class T> 
-inline int CKVector<T>::Compare(T a, T b)
+inline int CKeVector<T>::Compare(T a, T b)
 {
 	return a < b ? -1 : (a == b ? 0 : 1); 
 }

@@ -76,7 +76,7 @@ NTSTATUS CDevice::CreateDevice(CDriver *pDriver, bool bCompleteInitialization/* 
 
 
 	NTSTATUS st = STATUS_SUCCESS;
-	CKStringW FullDevicePath;
+	CKeStringW FullDevicePath;
 	if (m_DeviceName.Length())
 	{
 		FullDevicePath = L"\\Device\\";
@@ -229,7 +229,7 @@ NTSTATUS CDevice::AttachToDeviceStack(PDEVICE_OBJECT DeviceObject)
 	return STATUS_SUCCESS;
 }
 
-NTSTATUS CDevice::AttachToDevice(CKStringW DevicePath)
+NTSTATUS CDevice::AttachToDevice(CKeStringW DevicePath)
 {
 	if (!m_pDeviceObject)
 		return STATUS_INVALID_DEVICE_STATE;

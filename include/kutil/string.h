@@ -26,17 +26,17 @@ struct StringBaseFree
 };
 
 template<typename T,typename NTStr, typename AllocMem=StringBaseAlloc, typename FreeMem=StringBaseFree>
-class CKStringBase
+class CKeStringBase
 {
 public:
 	typedef NTStr* PNTStr ;
 	enum{ INVALID_POS = -1};  //错误的长度，位置等
-	CKStringBase();
-	CKStringBase(T c);
-	CKStringBase(const T *chars);
-	CKStringBase(const CKStringBase &s);
+	CKeStringBase();
+	CKeStringBase(T c);
+	CKeStringBase(const T *chars);
+	CKeStringBase(const CKeStringBase &s);
 
-	~CKStringBase();
+	~CKeStringBase();
 	operator const T*() const ;
 	T Back() const ;
 
@@ -45,33 +45,33 @@ public:
 	void ReleaseBuffer() ;
 	void ReleaseBuffer(int newLength);
 
-	CKStringBase& operator=(T c);
-	CKStringBase& operator=(const T *chars);
-	CKStringBase& operator=(const PNTStr ntStr);
-	CKStringBase& operator=(const CKStringBase& s);
-	CKStringBase& operator+=(T c);
-	CKStringBase& operator+=(const T *s);
-	CKStringBase& operator+=(const CKStringBase &s);
+	CKeStringBase& operator=(T c);
+	CKeStringBase& operator=(const T *chars);
+	CKeStringBase& operator=(const PNTStr ntStr);
+	CKeStringBase& operator=(const CKeStringBase& s);
+	CKeStringBase& operator+=(T c);
+	CKeStringBase& operator+=(const T *s);
+	CKeStringBase& operator+=(const CKeStringBase &s);
 	operator const PNTStr();
-	CKStringBase Mid(int startIndex) const;
-	CKStringBase Mid(int startIndex, int count) const;
-	CKStringBase Left(int count) const;
-	CKStringBase Right(int count) const;
+	CKeStringBase Mid(int startIndex) const;
+	CKeStringBase Mid(int startIndex, int count) const;
+	CKeStringBase Left(int count) const;
+	CKeStringBase Right(int count) const;
 
 	void MakeUpper();
 	void MakeLower(); 
 	
-	int Compare(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s) const;
+	int Compare(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s) const;
 	int Compare(const T *s) const;
-	int CompareNoCase(const CKStringBase& s) const;
+	int CompareNoCase(const CKeStringBase& s) const;
 	int CompareNoCase(const T *s) const;
 
 	int Find(T c) const ;
 	int Find(T c, int startIndex) const;
-	int Find(const CKStringBase &s) const ;
-	int Find(const CKStringBase &s, int startIndex) const;
+	int Find(const CKeStringBase &s) const ;
+	int Find(const CKeStringBase &s, int startIndex) const;
 	int ReverseFind(T c) const;
-	int FindOneOf(const CKStringBase &s) const;
+	int FindOneOf(const CKeStringBase &s) const;
 
 	void TrimLeft(T c);
 	void TrimLeft();
@@ -79,10 +79,10 @@ public:
 	void TrimRight(T c);
 	void Trim();
 
-	int Insert(int index, const CKStringBase &s);
+	int Insert(int index, const CKeStringBase &s);
 	int Insert(int index, T c);
 	int Append(T c);
-	int Append(const CKStringBase &s);
+	int Append(const CKeStringBase &s);
 
 	int Format(const T* pstrFormat, ...);
 	int FormatV(const wchar_t* pszFormat, va_list args );
@@ -95,17 +95,17 @@ public:
 	bool IsEmpty() const ;
 
 	int Replace(T oldChar, T newChar);
-	int Replace(const CKStringBase &oldString, const CKStringBase &newString);
+	int Replace(const CKeStringBase &oldString, const CKeStringBase &newString);
 
 	int Delete(int index, int count = 1);
 	void DeleteBack();
-	void TrimLeftWithCharSet(const CKStringBase &charSet);
-	void TrimRightWithCharSet(const CKStringBase &charSet);
+	void TrimLeftWithCharSet(const CKeStringBase &charSet);
+	void TrimRightWithCharSet(const CKeStringBase &charSet);
 private:
 
 	inline void GrowLength(int n);
 	inline void CorrectIndex(int &index) const;
-	CKStringBase GetTrimDefaultCharSet();
+	CKeStringBase GetTrimDefaultCharSet();
 	inline T * StringCopy(T *dest, const T *src);
 	inline int StringLen(const T *s);
 	inline const T* GetNextCharPointer(const T *p)const;
@@ -126,57 +126,57 @@ private:
 };
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> operator+(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s2);
+CKeStringBase<T,NTStr,AllocMem,FreeMem> operator+(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s2);
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> operator+(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s, T c);
+CKeStringBase<T,NTStr,AllocMem,FreeMem> operator+(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s, T c);
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> operator+(T c, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s);
+CKeStringBase<T,NTStr,AllocMem,FreeMem> operator+(T c, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s);
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> operator+(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s, const T * chars);
+CKeStringBase<T,NTStr,AllocMem,FreeMem> operator+(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s, const T * chars);
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> operator+(const T * chars, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s);
+CKeStringBase<T,NTStr,AllocMem,FreeMem> operator+(const T * chars, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s);
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator==(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s2);
+bool operator==(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s2);
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator<(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s2);
+bool operator<(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s2);
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator==(const T *s1, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s2);
+bool operator==(const T *s1, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s2);
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator==(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s1, const T *s2);
+bool operator==(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s1, const T *s2);
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator!=(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s2);
+bool operator!=(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s2);
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator!=(const T *s1, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s2);
+bool operator!=(const T *s1, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s2);
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator!=(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s1, const T *s2);
+bool operator!=(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s1, const T *s2);
 
-typedef CKStringBase<char, ANSI_STRING , StringBaseAlloc,StringBaseFree>   CKStringA;
-typedef CKStringBase<wchar_t, UNICODE_STRING,StringBaseAlloc,StringBaseFree>CKStringW;
+typedef CKeStringBase<char, ANSI_STRING , StringBaseAlloc,StringBaseFree>   CKeStringA;
+typedef CKeStringBase<wchar_t, UNICODE_STRING,StringBaseAlloc,StringBaseFree>CKeStringW;
 
 
 
 
 /*-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_*/
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem>::CKStringBase() : _chars(0), _length(0) , _capacity(0) 
+CKeStringBase<T,NTStr,AllocMem,FreeMem>::CKeStringBase() : _chars(0), _length(0) , _capacity(0) 
 { 
 		SetCapacity(3); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem>::CKStringBase(T c):  _chars(0), _length(0), _capacity(0)
+CKeStringBase<T,NTStr,AllocMem,FreeMem>::CKeStringBase(T c):  _chars(0), _length(0), _capacity(0)
 {
 	memset(&_ntStr, 0, sizeof(_ntStr));
 	SetCapacity(1);
@@ -187,7 +187,7 @@ CKStringBase<T,NTStr,AllocMem,FreeMem>::CKStringBase(T c):  _chars(0), _length(0
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem>::CKStringBase(const T *chars): _chars(0), _length(0), _capacity(0)
+CKeStringBase<T,NTStr,AllocMem,FreeMem>::CKeStringBase(const T *chars): _chars(0), _length(0), _capacity(0)
 {
 	memset(&_ntStr, 0, sizeof(_ntStr));
 	if (chars)
@@ -201,7 +201,7 @@ CKStringBase<T,NTStr,AllocMem,FreeMem>::CKStringBase(const T *chars): _chars(0),
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem>::CKStringBase(const CKStringBase &s):  _chars(0), _length(0), _capacity(0)
+CKeStringBase<T,NTStr,AllocMem,FreeMem>::CKeStringBase(const CKeStringBase &s):  _chars(0), _length(0), _capacity(0)
 {
 	memset(&_ntStr, 0, sizeof(_ntStr));
 	SetCapacity(s._length);
@@ -210,7 +210,7 @@ CKStringBase<T,NTStr,AllocMem,FreeMem>::CKStringBase(const CKStringBase &s):  _c
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem>::~CKStringBase() 
+CKeStringBase<T,NTStr,AllocMem,FreeMem>::~CKeStringBase() 
 {  
 	delete []_chars;
 	_chars = NULL;
@@ -218,25 +218,25 @@ CKStringBase<T,NTStr,AllocMem,FreeMem>::~CKStringBase()
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem>::operator const T*() const 
+CKeStringBase<T,NTStr,AllocMem,FreeMem>::operator const T*() const 
 { 
 	return _chars;
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-T CKStringBase<T,NTStr,AllocMem,FreeMem>::Back() const 
+T CKeStringBase<T,NTStr,AllocMem,FreeMem>::Back() const 
 { 
 	return _chars[_length - 1]; 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-T* CKStringBase<T,NTStr,AllocMem,FreeMem>::GetBuffer()
+T* CKeStringBase<T,NTStr,AllocMem,FreeMem>::GetBuffer()
 {
 	return _chars;
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-T* CKStringBase<T,NTStr,AllocMem,FreeMem>::GetBufferSetLength(int minBufLenght)
+T* CKeStringBase<T,NTStr,AllocMem,FreeMem>::GetBufferSetLength(int minBufLenght)
 {
 	if (minBufLenght >= _capacity)
 		SetCapacity(minBufLenght);
@@ -245,20 +245,20 @@ T* CKStringBase<T,NTStr,AllocMem,FreeMem>::GetBufferSetLength(int minBufLenght)
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::ReleaseBuffer() 
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::ReleaseBuffer() 
 { 
 	ReleaseBuffer(StringLen(_chars));
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::ReleaseBuffer(int newLength)
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::ReleaseBuffer(int newLength)
 {
 	_chars[newLength] = 0;
 	_length = newLength;
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem>& CKStringBase<T,NTStr,AllocMem,FreeMem>::operator=(T c)
+CKeStringBase<T,NTStr,AllocMem,FreeMem>& CKeStringBase<T,NTStr,AllocMem,FreeMem>::operator=(T c)
 {
 	Empty();
 	SetCapacity(1);
@@ -269,7 +269,7 @@ CKStringBase<T,NTStr,AllocMem,FreeMem>& CKStringBase<T,NTStr,AllocMem,FreeMem>::
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem>& CKStringBase<T,NTStr,AllocMem,FreeMem>::operator=(const T *chars)
+CKeStringBase<T,NTStr,AllocMem,FreeMem>& CKeStringBase<T,NTStr,AllocMem,FreeMem>::operator=(const T *chars)
 {
 	Empty();
 	if ( chars )
@@ -284,7 +284,7 @@ CKStringBase<T,NTStr,AllocMem,FreeMem>& CKStringBase<T,NTStr,AllocMem,FreeMem>::
 }
 
 template<typename T, typename NTStr, typename AllocMem, typename FreeMem>
-CKStringBase<T, NTStr, AllocMem, FreeMem>& CKStringBase<T, NTStr, AllocMem, FreeMem>::operator=(const PNTStr ntStr)
+CKeStringBase<T, NTStr, AllocMem, FreeMem>& CKeStringBase<T, NTStr, AllocMem, FreeMem>::operator=(const PNTStr ntStr)
 {
 	if (ntStr->Length && ntStr->Buffer)
 	{
@@ -301,7 +301,7 @@ CKStringBase<T, NTStr, AllocMem, FreeMem>& CKStringBase<T, NTStr, AllocMem, Free
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem>& CKStringBase<T,NTStr,AllocMem,FreeMem>::operator=(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s)
+CKeStringBase<T,NTStr,AllocMem,FreeMem>& CKeStringBase<T,NTStr,AllocMem,FreeMem>::operator=(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s)
 {
 	if (&s == this)
 		return *this;
@@ -313,7 +313,7 @@ CKStringBase<T,NTStr,AllocMem,FreeMem>& CKStringBase<T,NTStr,AllocMem,FreeMem>::
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem>& CKStringBase<T,NTStr,AllocMem,FreeMem>::operator+=(T c)
+CKeStringBase<T,NTStr,AllocMem,FreeMem>& CKeStringBase<T,NTStr,AllocMem,FreeMem>::operator+=(T c)
 {
 	GrowLength(1);
 	_chars[_length] = c;
@@ -323,7 +323,7 @@ CKStringBase<T,NTStr,AllocMem,FreeMem>& CKStringBase<T,NTStr,AllocMem,FreeMem>::
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem>& CKStringBase<T,NTStr,AllocMem,FreeMem>::operator+=(const T *s)
+CKeStringBase<T,NTStr,AllocMem,FreeMem>& CKeStringBase<T,NTStr,AllocMem,FreeMem>::operator+=(const T *s)
 {
 	if ( s )
 	{
@@ -337,7 +337,7 @@ CKStringBase<T,NTStr,AllocMem,FreeMem>& CKStringBase<T,NTStr,AllocMem,FreeMem>::
 }
 
 template<typename T, typename NTStr, typename AllocMem, typename FreeMem>
-CKStringBase<T, NTStr, AllocMem, FreeMem>::operator const PNTStr()
+CKeStringBase<T, NTStr, AllocMem, FreeMem>::operator const PNTStr()
 {
 	if (IsEmpty() )
 	{
@@ -354,7 +354,7 @@ CKStringBase<T, NTStr, AllocMem, FreeMem>::operator const PNTStr()
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem>& CKStringBase<T,NTStr,AllocMem,FreeMem>::operator+=(const CKStringBase<T,NTStr,AllocMem,FreeMem> &s)
+CKeStringBase<T,NTStr,AllocMem,FreeMem>& CKeStringBase<T,NTStr,AllocMem,FreeMem>::operator+=(const CKeStringBase<T,NTStr,AllocMem,FreeMem> &s)
 {
 	GrowLength(s._length);
 	StringCopy(_chars + _length, s._chars);
@@ -364,13 +364,13 @@ CKStringBase<T,NTStr,AllocMem,FreeMem>& CKStringBase<T,NTStr,AllocMem,FreeMem>::
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> CKStringBase<T,NTStr,AllocMem,FreeMem>::Mid(int startIndex) const
+CKeStringBase<T,NTStr,AllocMem,FreeMem> CKeStringBase<T,NTStr,AllocMem,FreeMem>::Mid(int startIndex) const
 { 
 	return Mid(startIndex, _length - startIndex); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> CKStringBase<T,NTStr,AllocMem,FreeMem>::Mid(int startIndex, int count) const
+CKeStringBase<T,NTStr,AllocMem,FreeMem> CKeStringBase<T,NTStr,AllocMem,FreeMem>::Mid(int startIndex, int count) const
 {
 	if (startIndex + count > _length)
 		count = _length - startIndex;
@@ -380,7 +380,7 @@ CKStringBase<T,NTStr,AllocMem,FreeMem> CKStringBase<T,NTStr,AllocMem,FreeMem>::M
 	if (startIndex == 0 && startIndex + count == _length)
 		return *this;
 
-	CKStringBase<T,NTStr,AllocMem,FreeMem> result;
+	CKeStringBase<T,NTStr,AllocMem,FreeMem> result;
 	result.SetCapacity(count);
 
 	for (int i = 0; i < count; i++)
@@ -393,14 +393,14 @@ CKStringBase<T,NTStr,AllocMem,FreeMem> CKStringBase<T,NTStr,AllocMem,FreeMem>::M
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> CKStringBase<T,NTStr,AllocMem,FreeMem>::Left(int count) const
+CKeStringBase<T,NTStr,AllocMem,FreeMem> CKeStringBase<T,NTStr,AllocMem,FreeMem>::Left(int count) const
 { 
 	return Mid(0, count); 
 }
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> CKStringBase<T,NTStr,AllocMem,FreeMem>::Right(int count) const
+CKeStringBase<T,NTStr,AllocMem,FreeMem> CKeStringBase<T,NTStr,AllocMem,FreeMem>::Right(int count) const
 {
 	if (count > _length)
 		count = _length;
@@ -408,52 +408,52 @@ CKStringBase<T,NTStr,AllocMem,FreeMem> CKStringBase<T,NTStr,AllocMem,FreeMem>::R
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::MakeUpper() 
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::MakeUpper() 
 { 
 	for (int i = 0; i <= _length; i++)
 		_chars[i] = CharUpper(_chars[i]);
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::MakeLower() 
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::MakeLower() 
 { 
 	for (int i = 0; i <= _length; i++)
 		_chars[i] = CharLower(_chars[i]);
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Compare(const CKStringBase& s) const
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Compare(const CKeStringBase& s) const
 { 
 	return StringCompare(_chars, s._chars); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Compare(const T *s) const
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Compare(const T *s) const
 { 
 	return StringCompare(_chars, s); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::CompareNoCase(const CKStringBase& s) const
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::CompareNoCase(const CKeStringBase& s) const
 { 
 	return StringCompareNoCase(_chars, s._chars); 
 }
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::CompareNoCase(const T *s) const
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::CompareNoCase(const T *s) const
 { 
 	return StringCompareNoCase(_chars, s); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Find(T c) const 
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Find(T c) const 
 { 
 	return Find(c, 0); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Find(T c, int startIndex) const
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Find(T c, int startIndex) const
 {
 	const T *p = _chars + startIndex;
 	for (;;)
@@ -469,13 +469,13 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::Find(T c, int startIndex) const
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Find(const CKStringBase<T,NTStr,AllocMem,FreeMem> &s) const 
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Find(const CKeStringBase<T,NTStr,AllocMem,FreeMem> &s) const 
 { 
 	return Find(s, 0); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Find(const CKStringBase<T,NTStr,AllocMem,FreeMem> &s, int startIndex) const
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Find(const CKeStringBase<T,NTStr,AllocMem,FreeMem> &s, int startIndex) const
 {
 	if (s.IsEmpty())
 		return startIndex;
@@ -492,7 +492,7 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::Find(const CKStringBase<T,NTStr,Allo
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::ReverseFind(T c) const
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::ReverseFind(T c) const
 {
 	if (_length == 0)
 		return -1;
@@ -510,7 +510,7 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::ReverseFind(T c) const
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::FindOneOf(const CKStringBase<T,NTStr,AllocMem,FreeMem> &s) const
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::FindOneOf(const CKeStringBase<T,NTStr,AllocMem,FreeMem> &s) const
 {
 	for (int i = 0; i < _length; i++)
 		if (s.Find(_chars[i]) >= 0)
@@ -519,7 +519,7 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::FindOneOf(const CKStringBase<T,NTStr
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::TrimLeft(T c)
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::TrimLeft(T c)
 {
 	const T *p = _chars;
 	while (c == *p)
@@ -528,19 +528,19 @@ void CKStringBase<T, NTStr,AllocMem,FreeMem>::TrimLeft(T c)
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::TrimLeft()
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::TrimLeft()
 {
 	TrimLeftWithCharSet(GetTrimDefaultCharSet());
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::TrimRight()
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::TrimRight()
 {
 	TrimRightWithCharSet(GetTrimDefaultCharSet());
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::TrimRight(T c)
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::TrimRight(T c)
 {
 	const T *p = _chars;
 	const T *pLast = NULL;
@@ -564,14 +564,14 @@ void CKStringBase<T, NTStr,AllocMem,FreeMem>::TrimRight(T c)
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::Trim()
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::Trim()
 {
 	TrimRight();
 	TrimLeft();
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Insert(int index, const CKStringBase<T,NTStr,AllocMem,FreeMem> &s)
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Insert(int index, const CKeStringBase<T,NTStr,AllocMem,FreeMem> &s)
 {
 	CorrectIndex(index);
 	if (s.IsEmpty())
@@ -585,7 +585,7 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::Insert(int index, const CKStringBase
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Insert(int index, T c)
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Insert(int index, T c)
 {
 	InsertSpace(index, 1);
 	_chars[index] = c;
@@ -594,19 +594,19 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::Insert(int index, T c)
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Append(T c)
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Append(T c)
 {
 	return Insert(Length(),c);
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Append(const CKStringBase<T,NTStr,AllocMem,FreeMem> &s)
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Append(const CKeStringBase<T,NTStr,AllocMem,FreeMem> &s)
 {
 	return Insert(Length(),s);
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Format(const T* pstrFormat, ...)
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Format(const T* pstrFormat, ...)
 {
 	va_list argList;
 	va_start(argList, pstrFormat);
@@ -617,7 +617,7 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::Format(const T* pstrFormat, ...)
 
 #pragma warning(disable:4996)
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::FormatV(const char* pszFormat, va_list args )
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::FormatV(const char* pszFormat, va_list args )
 {
 	T* szSprintf = NULL;
 	int nLen = 0;
@@ -631,7 +631,7 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::FormatV(const char* pszFormat, va_li
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::FormatV(const wchar_t * pszFormat, va_list args )
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::FormatV(const wchar_t * pszFormat, va_list args )
 {
 	T* szSprintf = NULL;
 	int nLen = 0;
@@ -646,9 +646,9 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::FormatV(const wchar_t * pszFormat, v
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::AppendFormat(const T* pstrFormat, ...)
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::AppendFormat(const T* pstrFormat, ...)
 {
-	CKStringBase<T,NTStr,AllocMem,FreeMem> s;
+	CKeStringBase<T,NTStr,AllocMem,FreeMem> s;
 	va_list argList;
 	va_start(argList, pstrFormat);
 	int iRet = s.FormatV(pstrFormat,argList);
@@ -659,26 +659,26 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::AppendFormat(const T* pstrFormat, ..
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::Empty()
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::Empty()
 {
 	_length = 0;
 	if (_chars) _chars[0] = 0;
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Length() const 
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Length() const 
 { 
 	return _length; 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool CKStringBase<T,NTStr,AllocMem,FreeMem>::IsEmpty() const 
+bool CKeStringBase<T,NTStr,AllocMem,FreeMem>::IsEmpty() const 
 { 
 	return (_length == 0); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Replace(T oldChar, T newChar)
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Replace(T oldChar, T newChar)
 {
 	if (oldChar == newChar)
 		return 0;
@@ -698,7 +698,7 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::Replace(T oldChar, T newChar)
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Replace(const CKStringBase<T,NTStr,AllocMem,FreeMem> &oldString, const CKStringBase<T,NTStr,AllocMem,FreeMem> &newString)
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Replace(const CKeStringBase<T,NTStr,AllocMem,FreeMem> &oldString, const CKeStringBase<T,NTStr,AllocMem,FreeMem> &newString)
 {
 	if (oldString.IsEmpty())
 		return 0;
@@ -722,7 +722,7 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::Replace(const CKStringBase<T,NTStr,A
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-int CKStringBase<T,NTStr,AllocMem,FreeMem>::Delete(int index, int count)
+int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Delete(int index, int count)
 {
 	if (index + count > _length)
 		count = _length - index;
@@ -735,13 +735,13 @@ int CKStringBase<T,NTStr,AllocMem,FreeMem>::Delete(int index, int count)
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::DeleteBack() 
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::DeleteBack() 
 { 
 	Delete(_length - 1); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::TrimLeftWithCharSet(const CKStringBase &charSet)
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::TrimLeftWithCharSet(const CKeStringBase &charSet)
 {
 	const T *p = _chars;
 	while (charSet.Find(*p) >= 0 && (*p != 0))
@@ -750,7 +750,7 @@ void CKStringBase<T, NTStr,AllocMem,FreeMem>::TrimLeftWithCharSet(const CKString
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::TrimRightWithCharSet(const CKStringBase &charSet)
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::TrimRightWithCharSet(const CKeStringBase &charSet)
 {
 	const T *p = _chars;
 	const T *pLast = NULL;
@@ -774,7 +774,7 @@ void CKStringBase<T, NTStr,AllocMem,FreeMem>::TrimRightWithCharSet(const CKStrin
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-inline void CKStringBase<T, NTStr,AllocMem,FreeMem>::GrowLength(int n)
+inline void CKeStringBase<T, NTStr,AllocMem,FreeMem>::GrowLength(int n)
 {
 	int freeSize = _capacity - _length - 1;
 	if (n <= freeSize)
@@ -795,16 +795,16 @@ inline void CKStringBase<T, NTStr,AllocMem,FreeMem>::GrowLength(int n)
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-inline void CKStringBase<T, NTStr,AllocMem,FreeMem>::CorrectIndex(int &index) const
+inline void CKeStringBase<T, NTStr,AllocMem,FreeMem>::CorrectIndex(int &index) const
 {
 	if(index > _length)
 		index = _length;
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> CKStringBase<T,NTStr,AllocMem,FreeMem>::GetTrimDefaultCharSet()
+CKeStringBase<T,NTStr,AllocMem,FreeMem> CKeStringBase<T,NTStr,AllocMem,FreeMem>::GetTrimDefaultCharSet()
 {
-	CKStringBase<T,NTStr,AllocMem,FreeMem> charSet;
+	CKeStringBase<T,NTStr,AllocMem,FreeMem> charSet;
 	charSet += (T)' ';
 	charSet += (T)'\n';
 	charSet += (T)'\t';
@@ -812,7 +812,7 @@ CKStringBase<T,NTStr,AllocMem,FreeMem> CKStringBase<T,NTStr,AllocMem,FreeMem>::G
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-inline T * CKStringBase<T,NTStr,AllocMem,FreeMem>::StringCopy(T *dest, const T *src)
+inline T * CKeStringBase<T,NTStr,AllocMem,FreeMem>::StringCopy(T *dest, const T *src)
 {
 	if (dest && src)
 	{
@@ -825,7 +825,7 @@ inline T * CKStringBase<T,NTStr,AllocMem,FreeMem>::StringCopy(T *dest, const T *
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-inline int CKStringBase<T,NTStr,AllocMem,FreeMem>::StringLen(const T *s)
+inline int CKeStringBase<T,NTStr,AllocMem,FreeMem>::StringLen(const T *s)
 {
 	if(!s) return 0;
 
@@ -835,19 +835,19 @@ inline int CKStringBase<T,NTStr,AllocMem,FreeMem>::StringLen(const T *s)
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-inline const T* CKStringBase<T,NTStr,AllocMem,FreeMem>::GetNextCharPointer(const T *p)const
+inline const T* CKeStringBase<T,NTStr,AllocMem,FreeMem>::GetNextCharPointer(const T *p)const
 { 
 	return (p + 1); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-inline const T* CKStringBase<T,NTStr,AllocMem,FreeMem>::GetPrevCharPointer(const T *, const T *p)const
+inline const T* CKeStringBase<T,NTStr,AllocMem,FreeMem>::GetPrevCharPointer(const T *, const T *p)const
 { 
 	return (p - 1); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-inline void CKStringBase<T, NTStr,AllocMem,FreeMem>::SetCapacity(int newCapacity)
+inline void CKeStringBase<T, NTStr,AllocMem,FreeMem>::SetCapacity(int newCapacity)
 {
 	int realCapacity = newCapacity + 1;
 	if (realCapacity == _capacity)
@@ -869,13 +869,13 @@ inline void CKStringBase<T, NTStr,AllocMem,FreeMem>::SetCapacity(int newCapacity
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::MoveItems(int destIndex, int srcIndex)
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::MoveItems(int destIndex, int srcIndex)
 {
 	memmove(_chars + destIndex, _chars + srcIndex,sizeof(T) * (_length - srcIndex + 1));
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-void CKStringBase<T, NTStr,AllocMem,FreeMem>::InsertSpace(int &index, int size)
+void CKeStringBase<T, NTStr,AllocMem,FreeMem>::InsertSpace(int &index, int size)
 {
 	CorrectIndex(index);
 	GrowLength(size);
@@ -883,7 +883,7 @@ void CKStringBase<T, NTStr,AllocMem,FreeMem>::InsertSpace(int &index, int size)
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-inline int CKStringBase<T,NTStr,AllocMem,FreeMem>::StringCompare(const char *s1, const char *s2) const
+inline int CKeStringBase<T,NTStr,AllocMem,FreeMem>::StringCompare(const char *s1, const char *s2) const
 {
 	if (s1 && s2)
 	{
@@ -901,7 +901,7 @@ inline int CKStringBase<T,NTStr,AllocMem,FreeMem>::StringCompare(const char *s1,
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-inline int CKStringBase<T,NTStr,AllocMem,FreeMem>::StringCompare(const wchar_t *s1, const wchar_t *s2) const
+inline int CKeStringBase<T,NTStr,AllocMem,FreeMem>::StringCompare(const wchar_t *s1, const wchar_t *s2) const
 {	
 	if (s1 && s2)
 	{
@@ -919,7 +919,7 @@ inline int CKStringBase<T,NTStr,AllocMem,FreeMem>::StringCompare(const wchar_t *
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-inline T CKStringBase<T,NTStr,AllocMem,FreeMem>::CharUpper(T c) const 
+inline T CKeStringBase<T,NTStr,AllocMem,FreeMem>::CharUpper(T c) const 
 {
 	if (c>='a'&&c<='z'){ 
 		c = (c - 32);
@@ -928,7 +928,7 @@ inline T CKStringBase<T,NTStr,AllocMem,FreeMem>::CharUpper(T c) const
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-inline T CKStringBase<T,NTStr,AllocMem,FreeMem>::CharLower(T c) const 
+inline T CKeStringBase<T,NTStr,AllocMem,FreeMem>::CharLower(T c) const 
 {
 	if (c>='A'&&c<='Z'){ 
 		c = (c + 32);
@@ -937,7 +937,7 @@ inline T CKStringBase<T,NTStr,AllocMem,FreeMem>::CharLower(T c) const
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-inline int CKStringBase<T,NTStr,AllocMem,FreeMem>::StringCompareNoCase(const T *s1, const T *s2) const
+inline int CKeStringBase<T,NTStr,AllocMem,FreeMem>::StringCompareNoCase(const T *s1, const T *s2) const
 {
 	if (s1 && s2){
 		for (;;){
@@ -957,83 +957,83 @@ inline int CKStringBase<T,NTStr,AllocMem,FreeMem>::StringCompareNoCase(const T *
 
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> operator+(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s2)
+CKeStringBase<T,NTStr,AllocMem,FreeMem> operator+(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s2)
 {
-	CKStringBase<T,NTStr,AllocMem,FreeMem> result(s1);
+	CKeStringBase<T,NTStr,AllocMem,FreeMem> result(s1);
 	result += s2;
 	return result;
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> operator+(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s, T c)
+CKeStringBase<T,NTStr,AllocMem,FreeMem> operator+(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s, T c)
 {
-	CKStringBase<T,NTStr,AllocMem,FreeMem> result(s);
+	CKeStringBase<T,NTStr,AllocMem,FreeMem> result(s);
 	result += c;
 	return result;
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> operator+(T c, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s)
+CKeStringBase<T,NTStr,AllocMem,FreeMem> operator+(T c, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s)
 {
-	CKStringBase<T,NTStr,AllocMem,FreeMem> result(c);
+	CKeStringBase<T,NTStr,AllocMem,FreeMem> result(c);
 	result += s;
 	return result;
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> operator+(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s, const T * chars)
+CKeStringBase<T,NTStr,AllocMem,FreeMem> operator+(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s, const T * chars)
 {
-	CKStringBase<T,NTStr,AllocMem,FreeMem> result(s);
+	CKeStringBase<T,NTStr,AllocMem,FreeMem> result(s);
 	result += chars;
 	return result;
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-CKStringBase<T,NTStr,AllocMem,FreeMem> operator+(const T * chars, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s)
+CKeStringBase<T,NTStr,AllocMem,FreeMem> operator+(const T * chars, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s)
 {
-	CKStringBase<T,NTStr,AllocMem,FreeMem> result(chars);
+	CKeStringBase<T,NTStr,AllocMem,FreeMem> result(chars);
 	result += s;
 	return result;
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator==(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s2)
+bool operator==(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s2)
 { 
 	return (s1.Compare(s2) == 0); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator<(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s2)
+bool operator<(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s2)
 { 
 	return (s1.Compare(s2) < 0); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator==(const T *s1, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s2)
+bool operator==(const T *s1, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s2)
 { 
 	return (s2.Compare(s1) == 0); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator==(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s1, const T *s2)
+bool operator==(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s1, const T *s2)
 {
 	return (s1.Compare(s2) == 0); 
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator!=(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s2)
+bool operator!=(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s1, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s2)
 { 
 	return (s1.Compare(s2) != 0);
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator!=(const T *s1, const CKStringBase<T,NTStr,AllocMem,FreeMem>& s2)
+bool operator!=(const T *s1, const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s2)
 { 
 	return (s2.Compare(s1) != 0);
 }
 
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
-bool operator!=(const CKStringBase<T,NTStr,AllocMem,FreeMem>& s1, const T *s2)
+bool operator!=(const CKeStringBase<T,NTStr,AllocMem,FreeMem>& s1, const T *s2)
 { 
 	return (s1.Compare(s2) != 0);
 }
