@@ -129,22 +129,20 @@ private:
 		ZeroMemory(&ctxt,sizeof(ctxt));
 		ctxt.view.Length = sizeof( REMOTE_PORT_VIEW );
 		LARGE_INTEGER   Timeout = {0};
-		Timeout.HighPart = 0;
-		Timeout.LowPart  = 1000;
+		Timeout.HighPart = 1000 * 10;;
+		Timeout.LowPart  = 1000 * 10;
 
 		MYPORT_MESSAGE    PortMsg;
 		memset(&PortMsg, 0, sizeof(PortMsg));
 		while( TRUE )
 		{
-			st = ZwReplyWaitReceivePortEx(m_hPort,(LPVOID*)&ctxt,NULL,&PortMsg,&Timeout);
+			st = ZwReplyWaitReceivePort(m_hPort,(LPVOID*)&ctxt,NULL,&PortMsg);
 			if ( st == STATUS_PORT_CLOSED )
 				break;
-
-			if(st == STATUS_TIMEOUT)
-			{
+			else if ( st == STATUS_INVALID_HANDLE)
+				break;
+			else if(st == STATUS_TIMEOUT)
 				continue;
-			}
-
 			else if ( st == STATUS_SUCCESS )
 			{
 				short msg_type = PortMsg.u2.s2.Type;
