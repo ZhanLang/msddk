@@ -143,7 +143,14 @@ extern "C"
 		__out PPORT_MESSAGE ReceiveMessage,
 		__in_opt PLARGE_INTEGER Timeout
 		);
-
+	NTSTATUS
+		NTAPI
+		ZwReplyWaitReceivePort(
+		__in HANDLE PortHandle,
+		__out_opt PVOID *PortContext ,
+		__in_opt PPORT_MESSAGE ReplyMessage,
+		__out PPORT_MESSAGE ReceiveMessage
+		);
 	NTSTATUS
 		NTAPI
 		ZwAcceptConnectPort(
