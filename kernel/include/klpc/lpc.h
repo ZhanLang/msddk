@@ -15,6 +15,8 @@
 #define MAX_LPC_DATA		0x200    // 通过LPC可以拷贝的最大字节数
 #define LARGE_MESSAGE_SIZE	0x9000
 
+#ifndef __WIN_EX__
+
 typedef struct _PORT_MESSAGE {
 	union {
 		struct {
@@ -39,7 +41,7 @@ typedef struct _PORT_MESSAGE {
 		LPC_SIZE_T ClientViewSize;          // Only valid on LPC_CONNECTION_REQUEST message
 		ULONG CallbackId;                   // Only valid on LPC_REQUEST message
 	};
-	UCHAR Data[100];
+	//UCHAR Data[1];
 } PORT_MESSAGE, *PPORT_MESSAGE;
 
 typedef struct _PORT_VIEW {
@@ -51,6 +53,17 @@ typedef struct _PORT_VIEW {
 	LPC_PVOID ViewRemoteBase;
 } PORT_VIEW, *PPORT_VIEW;
 
+typedef struct _REMOTE_PORT_VIEW {
+	ULONG Length;
+	LPC_SIZE_T ViewSize;
+	LPC_PVOID ViewBase;
+} REMOTE_PORT_VIEW, *PREMOTE_PORT_VIEW;
+
+#endif // __WIN_EX__
+typedef struct _MYPORT_MESSAGE : public PORT_MESSAGE {
+	
+	UCHAR Data[100];
+} MYPORT_MESSAGE, *PMYPORT_MESSAGE;
 
 typedef struct _CLIENT_MESSAGE_INFO_
 {
@@ -67,11 +80,7 @@ typedef struct _CLIENT_MESSAGE_INFO_
 }CLIENT_MSG, *PCLIENT_MSG;
 
 
-typedef struct _REMOTE_PORT_VIEW {
-	ULONG Length;
-	LPC_SIZE_T ViewSize;
-	LPC_PVOID ViewBase;
-} REMOTE_PORT_VIEW, *PREMOTE_PORT_VIEW;
+
 
 
 #define GET_MESSAGE_INFO_POINT(p) ( PCLIENT_MSG )(p)

@@ -1,7 +1,11 @@
 #pragma once
 #include <kutil/string.h>
-#include "lpc.h"
+
 #include <kutil/memory.h>
+
+
+
+#include "lpc.h"
 
 namespace msddk { ;
 
@@ -34,12 +38,13 @@ public:
 	{
 	
 		NTSTATUS st = STATUS_UNSUCCESSFUL;
-		PORT_MESSAGE Msg = { 0 };
+		MYPORT_MESSAGE Msg;
 		KE_FAILED(CreateSection());
 		KE_FAILED(Connect());
-		
+
+		memset(&Msg, 0, sizeof(Msg));
 		Msg.u1.s1.DataLength = (short)0;
-		Msg.u1.s1.TotalLength = (short)sizeof(PORT_MESSAGE);
+		Msg.u1.s1.TotalLength = (short)sizeof(Msg);
 
 		if ( !(m_View.ViewBase && m_View.ViewRemoteBase) )
 		{
