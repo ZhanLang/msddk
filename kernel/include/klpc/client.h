@@ -13,38 +13,38 @@ public:
 		memset(&m_View, 0, sizeof(m_View));
 		if ( lpszPortName )
 			m_PortName = lpszPortName;
-		
-
-		if ( NT_SUCCESS(CreateSection()) )
-		{
-			Connect();
-		}
 	};
+
 	~CKeLpcClient()
 	{
-		if ( m_hPort )
+		if (m_hPort)
+		{
 			ZwClose(m_hPort);
-		
-		if ( m_hSection )
+			m_hPort = NULL;
+		}
+		if (m_hSection)
+		{
 			ZwClose(m_hSection);
+			m_hSection = NULL;
+		}
 	}
 
-	NTSTATUS AskUser(int uCode, void *pInBuffer, ULONG InputLength, void * OutputBuffer, ULONG OutputLength)
+	NTSTATUS AskUser(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
 	{
-		UNREFERENCED_PARAMETER(uCode);
-		UNREFERENCED_PARAMETER(pInBuffer);
-		UNREFERENCED_PARAMETER(InputLength);
-		UNREFERENCED_PARAMETER(OutputBuffer);
-		UNREFERENCED_PARAMETER(OutputLength);
 		size_t	total_size = 0;
 		NTSTATUS st = STATUS_UNSUCCESSFUL;
-		if ( !m_hPort )
-			return STATUS_INVALID_HANDLE;
+
+		KE_FAILED(CreateSection());
+		KE_FAILED(Connect());
 		
 		total_size = sizeof(PORT_MESSAGE);
 		ke_sentry<PPORT_MESSAGE, ke_default_sentry> pMsg = (PPORT_MESSAGE)npagednew(total_size);
-		if ( !pMsg )
+		if (!pMsg)
+		{
+			KdPrint(("CKeLpcClient::AskUser(): failed call to npagednew()"));
 			return STATUS_NO_MEMORY;
+		}
+			
 
 		memset(pMsg, 0, total_size);
 
@@ -53,12 +53,55 @@ public:
 
 		if ( !(m_View.ViewBase && m_View.ViewRemoteBase) )
 		{
+			KdPrint(("CKeLpcClient::AskUser(): ViewBase is Null"));
 			return STATUS_INVALID_HANDLE;
 		}
 
-		CLIENT_MSG cmi = { STATUS_SUCCESS, 1, 0, 0 ,InputLength,0,uCode };
-		SET_MESSAGE_INFO(&cmi, (VOID*)m_View.ViewBase);
+		/*
+		typedef struct _CLIENT_MESSAGE_INFO_
+		{
+			NTSTATUS	st_result;
+			int			nMsgType;
+			int			nCmd;
+			int			nProd;
+			int			nSubProd;
+			int			nCPId;
+			int			nCTId;
+			int			nMsgSize;
+			int			nRetBufSize;
+			int			nRetSize;
+			
+		}CLIENT_MSG, *PCLIENT_MSG;
+		*/
 
+		CLIENT_MSG cmi = { STATUS_SUCCESS,0,uCode, 1, 0, 0 ,(int)InputLength,nOutCch ,0};
+		SET_MESSAGE_INFO(&cmi, (VOID*)m_View.ViewBase);
+		if (pInBuffer && InputLength)
+		{
+			SET_MESSAGE_DATA(pInBuffer, InputLength, m_View.ViewBase);
+		}
+
+		//阻塞线程等待服务端应答
+		st = ZwRequestWaitReplyPort(m_hPort, pMsg, pMsg);
+		if ( !NT_SUCCESS(st) )
+		{
+			KdPrint(("CKeLpcClient::AskUser(): failed call to ZwRequestWaitReplyPort() (%wS)\n", MapNTStatus(st)));
+			return st;
+		}
+
+		if (OutputBuffer && OutputLength)
+		{
+			int			iMsgSize = GET_MESSAGE_DATA_SIZE(m_View.ViewBase);
+			//PCLIENT_MSG pCMI	 = GET_MESSAGE_INFO_POINT(m_View.ViewBase);
+			LPBYTE		pOutMsg  = GET_MESSAGE_DATA_POINT(m_View.ViewBase);
+
+			*OutputLength = iMsgSize;
+
+			if (iMsgSize)
+			{
+				memcpy(OutputBuffer, pOutMsg, iMsgSize);
+			}
+		}
 		return st;
 	}
 

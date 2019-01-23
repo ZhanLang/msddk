@@ -55,12 +55,16 @@ typedef struct _PORT_VIEW {
 typedef struct _CLIENT_MESSAGE_INFO_
 {
 	NTSTATUS	st_result;
-	int			nMsgType;
-	int			nCPId;
-	int			nCTId;
-	int			nMsgSize;
-	int			nRetSize;
-	int			nCmd;
+	int			nMsgType;	/*消息类型*/
+	int			nMsgID;		/*消息ID*/
+	int			nProd;		/*产品ID*/
+	int			nSubProd;	/*子产品ID*/
+	int			nCPId;		/*调用者进程ID*/
+	int			nCTId;		/*调用者线程ID*/
+	int			nMsgSize;	/*消息体大小*/
+	int			nRetBufSize;/*调用者返回内存的大小*/
+	int			nRetSize;	/*实际返回的内存大小*/
+	
 }CLIENT_MSG, *PCLIENT_MSG;
 
 
@@ -79,16 +83,6 @@ typedef struct _REMOTE_PORT_VIEW {
 #define SET_MESSAGE_INFO(info, point) memcpy(point, info, sizeof(CLIENT_MSG));
 #define SET_MESSAGE_DATA(data,size, point) ((PCLIENT_MSG)(point))->nMsgSize = size; \
 						 memcpy((LPBYTE)point + sizeof(CLIENT_MSG), data, size);
-
-
-NTSTATUS NTAPI NtCreatePort(
-	OUT PHANDLE PortHandle,
-	IN POBJECT_ATTRIBUTES ObjectAttributes,
-	IN ULONG MaxConnectionInfoLength,
-	IN ULONG MaxMessageLength,
-	IN ULONG MaxPoolUsage
-);
-
 
 extern "C"
 {
@@ -120,5 +114,13 @@ extern "C"
 		ZwReplyPort(
 			__in HANDLE PortHandle,
 			__in PPORT_MESSAGE ReplyMessage
+		);
+
+	NTSTATUS
+		NTAPI
+		ZwRequestWaitReplyPort(
+			__in HANDLE PortHandle,
+			__in PPORT_MESSAGE RequestMessage,
+			__out PPORT_MESSAGE ReplyMessage
 		);
 }
