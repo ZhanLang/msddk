@@ -39,7 +39,7 @@ typedef struct _PORT_MESSAGE {
 		LPC_SIZE_T ClientViewSize;          // Only valid on LPC_CONNECTION_REQUEST message
 		ULONG CallbackId;                   // Only valid on LPC_REQUEST message
 	};
-	//UCHAR Data[1];
+	UCHAR Data[100];
 } PORT_MESSAGE, *PPORT_MESSAGE;
 
 typedef struct _PORT_VIEW {
@@ -63,7 +63,6 @@ typedef struct _CLIENT_MESSAGE_INFO_
 	int			nCTId;		/*调用者线程ID*/
 	int			nMsgSize;	/*消息体大小*/
 	int			nRetBufSize;/*调用者返回内存的大小*/
-	int			nRetSize;	/*实际返回的内存大小*/
 	
 }CLIENT_MSG, *PCLIENT_MSG;
 
@@ -86,6 +85,8 @@ typedef struct _REMOTE_PORT_VIEW {
 
 extern "C"
 {
+	
+
 	NTSTATUS
 		NTAPI
 		ZwConnectPort(
@@ -123,4 +124,33 @@ extern "C"
 			__in PPORT_MESSAGE RequestMessage,
 			__out PPORT_MESSAGE ReplyMessage
 		);
+
+	NTSTATUS
+		NTAPI
+		ZwReplyWaitReceivePortEx(
+		__in HANDLE PortHandle,
+		__out_opt PVOID *PortContext,
+		__in_opt PPORT_MESSAGE ReplyMessage,
+		__out PPORT_MESSAGE ReceiveMessage,
+		__in_opt PLARGE_INTEGER Timeout
+		);
+
+	NTSTATUS
+		NTAPI
+		ZwAcceptConnectPort(
+		__out PHANDLE PortHandle,
+		__in_opt PVOID PortContext,
+		__in PPORT_MESSAGE ConnectionRequest,
+		__in BOOLEAN AcceptConnection,
+		__inout_opt PPORT_VIEW ServerView,
+		__out_opt PREMOTE_PORT_VIEW ClientView
+		);
+
+	NTSTATUS
+		NTAPI
+		ZwCompleteConnectPort(
+		__in HANDLE PortHandle
+		);
+
+	
 }

@@ -2,6 +2,7 @@
 #include <kutil/string.h>
 #include "lpc.h"
 #include <kutil/memory.h>
+
 namespace msddk { ;
 
 class CKeLpcClient {
@@ -31,25 +32,14 @@ public:
 
 	NTSTATUS AskUser(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
 	{
-		size_t	total_size = 0;
+	
 		NTSTATUS st = STATUS_UNSUCCESSFUL;
-
+		PORT_MESSAGE Msg = { 0 };
 		KE_FAILED(CreateSection());
 		KE_FAILED(Connect());
 		
-		total_size = sizeof(PORT_MESSAGE);
-		ke_sentry<PPORT_MESSAGE, ke_default_sentry> pMsg = (PPORT_MESSAGE)npagednew(total_size);
-		if (!pMsg)
-		{
-			KdPrint(("CKeLpcClient::AskUser(): failed call to npagednew()"));
-			return STATUS_NO_MEMORY;
-		}
-			
-
-		memset(pMsg, 0, total_size);
-
-		pMsg->u1.s1.DataLength = (short)0;
-		pMsg->u1.s1.TotalLength = (short)total_size;
+		Msg.u1.s1.DataLength = (short)0;
+		Msg.u1.s1.TotalLength = (short)sizeof(PORT_MESSAGE);
 
 		if ( !(m_View.ViewBase && m_View.ViewRemoteBase) )
 		{
@@ -74,7 +64,7 @@ public:
 		}CLIENT_MSG, *PCLIENT_MSG;
 		*/
 
-		CLIENT_MSG cmi = { STATUS_SUCCESS,0,uCode, 1, 0, 0 ,(int)InputLength,nOutCch ,0};
+		CLIENT_MSG cmi = { STATUS_SUCCESS,0,uCode, 1, 0, 0, 0 ,(int)InputLength,nOutCch};
 		SET_MESSAGE_INFO(&cmi, (VOID*)m_View.ViewBase);
 		if (pInBuffer && InputLength)
 		{
@@ -82,7 +72,7 @@ public:
 		}
 
 		//阻塞线程等待服务端应答
-		st = ZwRequestWaitReplyPort(m_hPort, pMsg, pMsg);
+		st = ZwRequestWaitReplyPort(m_hPort, &Msg, &Msg);
 		if ( !NT_SUCCESS(st) )
 		{
 			KdPrint(("CKeLpcClient::AskUser(): failed call to ZwRequestWaitReplyPort() (%wS)\n", MapNTStatus(st)));
@@ -92,9 +82,7 @@ public:
 		if (OutputBuffer && OutputLength)
 		{
 			int			iMsgSize = GET_MESSAGE_DATA_SIZE(m_View.ViewBase);
-			//PCLIENT_MSG pCMI	 = GET_MESSAGE_INFO_POINT(m_View.ViewBase);
 			LPBYTE		pOutMsg  = GET_MESSAGE_DATA_POINT(m_View.ViewBase);
-
 			*OutputLength = iMsgSize;
 
 			if (iMsgSize)
