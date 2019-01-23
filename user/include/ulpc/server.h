@@ -104,7 +104,7 @@ private:
 			return HRESULT_FROM_NT(st);
 		}
 
-		BOOL bRet = m_threadPool.QueueRequest([=]{Listen();});
+		BOOL bRet = m_threadPool.QueueRequest([this]{Listen();});
 		if ( !bRet )
 		{
 			return E_FAIL;
@@ -153,7 +153,7 @@ private:
 				short msg_type = PortMsg.u2.s2.Type;
 				if ( msg_type == LPC_REQUEST)
 				{
-					m_threadPool.QueueRequest([=]{Listen();});
+					m_threadPool.QueueRequest([this]{Listen();});
 					void* pOutMsg		= NULL;
 					PCLIENT_MSG pCltMsg	= GET_MESSAGE_INFO_POINT( (LPVOID)ctxt.view.ViewBase );
 					PBYTE pMsgBody		= GET_MESSAGE_DATA_POINT( (LPVOID)ctxt.view.ViewBase );
