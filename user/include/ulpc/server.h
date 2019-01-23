@@ -93,7 +93,7 @@ private:
 		st = ZwCreatePort( &m_hPort,&oa,sizeof(MYPORT_MESSAGE),sizeof(MYPORT_MESSAGE),0 );
 		if( !NT_SUCCESS(st) )
 		{
-
+			return HRESULT_FROM_NT(st);
 		}
 
 		BOOL bRet = m_threadPool.QueueRequest([=]{Listen();});
