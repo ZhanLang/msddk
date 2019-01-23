@@ -131,7 +131,7 @@ NTSTATUS CDevice::CreateDevice(CDriver *pDriver, bool bCompleteInitialization/* 
 NTSTATUS CDevice::DeleteDevice(bool FromIRPHandler)
 {
 	UNREFERENCED_PARAMETER(FromIRPHandler);
-	KdPrint(("CDevice::DeleteDevice"));
+	KdPrint(("CDevice::DeleteDevice\n"));
 	NTSTATUS st = OnBeforeDelete();
 	if ( !NT_SUCCESS(st) )
 	{
@@ -141,7 +141,6 @@ NTSTATUS CDevice::DeleteDevice(bool FromIRPHandler)
 	m_bDeletePending = true;
 	if (m_pDeviceObject)
 	{
-		KdPrint(("CDevice::DeleteDevice1"));
 		if (m_LinkName.Length())
 			IoDeleteSymbolicLink(m_LinkName);
 
@@ -347,13 +346,13 @@ NTSTATUS CDevice::AttachToDevice(CKeStringW DevicePath)
 
 NTSTATUS CDevice::OnAfterCreate()
 {
-	KdPrint(("CDevice::OnAfterCreate()"));
+	KdPrint(("CDevice::OnAfterCreate()\n"));
 	return STATUS_SUCCESS;
 }
 
 NTSTATUS CDevice::OnBeforeDelete()
 {
-	KdPrint(("CDevice::OnBeforeDelete()"));
+	KdPrint(("CDevice::OnBeforeDelete()\n"));
 	return STATUS_SUCCESS;
 }
 

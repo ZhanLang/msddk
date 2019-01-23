@@ -33,7 +33,7 @@ void CDriver::OnDeviceUnregistered(const CDevice *pDevice)
 NTSTATUS CDriver::AddDevice(IN PDEVICE_OBJECT  PhysicalDeviceObject)
 {
 	UNREFERENCED_PARAMETER(PhysicalDeviceObject);
-	KdPrint(("CDriver::AddDevice"));
+	KdPrint(("CDriver::AddDevice\n"));
 	return STATUS_NOT_SUPPORTED;
 }
 
@@ -76,13 +76,13 @@ NTSTATUS CDriver::DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING Regis
 
 NTSTATUS CDriver::OnAfterInit()
 {
-	KdPrint(("CDriver::OnAfterInit()"));
+	KdPrint(("CDriver::OnAfterInit()\n"));
 	return STATUS_SUCCESS;
 }
 
 NTSTATUS CDriver::OnBeforeUnint()
 {
-	KdPrint(("CDriver::OnBeforeUnint()"));
+	KdPrint(("CDriver::OnBeforeUnint()\n"));
 	return STATUS_SUCCESS;
 }
 

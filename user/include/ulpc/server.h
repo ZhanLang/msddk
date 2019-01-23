@@ -73,6 +73,14 @@ public:
 	}
 	virtual NTSTATUS OnMsg(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
 	{
+		CString strF;
+		strF.Format(L"%d", nOutCch);
+
+		OutputDebugString(strF);
+		WCHAR* strName = L"Ma.Guojun";
+		int nSize = ( wcslen(strName) + 1) * sizeof(WCHAR);
+		memcpy(OutputBuffer, strName, nSize);
+		*OutputLength = nSize;
 		return STATUS_SUCCESS;
 	}
 	
@@ -128,10 +136,7 @@ private:
 
 		ZeroMemory(&ctxt,sizeof(ctxt));
 		ctxt.view.Length = sizeof( REMOTE_PORT_VIEW );
-		LARGE_INTEGER   Timeout = {0};
-		Timeout.HighPart = 1000 * 10;;
-		Timeout.LowPart  = 1000 * 10;
-
+		
 		MYPORT_MESSAGE    PortMsg;
 		memset(&PortMsg, 0, sizeof(PortMsg));
 		while( TRUE )
@@ -179,9 +184,13 @@ private:
 				else if ( msg_type == LPC_CONNECTION_REQUEST)
 				{
 					st = ZwAcceptConnectPort(&hConnectPort,&ctxt,&PortMsg,TRUE,NULL,&(ctxt.view));
+					if ( st != STATUS_SUCCESS )
+					{
+						ZwAcceptConnectPort(&hConnectPort, &ctxt,&PortMsg, FALSE, 0, 0);
+					}
 					if ( hConnectPort )
 					{
-						ZwCompleteConnectPort(&hConnectPort);
+						ZwCompleteConnectPort(hConnectPort);
 					}
 				}
 				else if (msg_type == LPC_PORT_CLOSED )

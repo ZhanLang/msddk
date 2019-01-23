@@ -48,7 +48,7 @@ public:
 
 		if ( !(m_View.ViewBase && m_View.ViewRemoteBase) )
 		{
-			KdPrint(("CKeLpcClient::AskUser(): ViewBase is Null"));
+			KdPrint(("CKeLpcClient::AskUser(): ViewBase is Null\n"));
 			return STATUS_INVALID_HANDLE;
 		}
 
