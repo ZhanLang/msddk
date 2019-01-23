@@ -80,11 +80,12 @@ public:
 	}
 
 
-	PIRP DequeuePacket(void **ppContext)
+
+	PIRP DequeuePacket(void **ppContext,BOOL bWait = TRUE)
 	{
 		if (m_bLastPacketDequeued)
 			return NULL;
-		if (m_Semaphore.WaitEx() != STATUS_WAIT_0)
+		if (bWait && (m_Semaphore.WaitEx() != STATUS_WAIT_0))
 			return NULL;
 		PIRP pReturnedIrp;
 		m_QueueSpinLock.Lock();

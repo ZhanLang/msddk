@@ -5,7 +5,7 @@
 #include "thread.h"
 namespace msddk { ;
 
-class CkeWorkerThreadBase : public CKeThread, public NonPagedObject
+class CkeWorkerThread : public CKeThread, public NonPagedObject
 {
 private:
 	CKeSpinLock m_SpinLock;
@@ -30,14 +30,14 @@ protected:
 	virtual void InitializeThread() {}
 	virtual void FinalizeThread() {}
 
-	CkeWorkerThreadBase()
+	CkeWorkerThread()
 		: m_pHead(NULL)
 		, m_pTail(NULL)
 	{
 		ASSERT(MmIsNonPagedSystemAddressValid(this));
 	}
 
-	~CkeWorkerThreadBase()
+	~CkeWorkerThread()
 	{
 		if (IsRunning())
 			Shutdown();
@@ -127,7 +127,7 @@ public:
 		if (!pItem->pParam)
 		{
 			delete pItem;
-			EnqueueItem(NULL);	//This is an 'end thread' message
+			EnqueueItem(NULL);
 			return NULL;
 		}
 		void *pResult = pItem->pParam;

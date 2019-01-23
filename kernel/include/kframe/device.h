@@ -1,6 +1,42 @@
 #pragma once
 #include<kutil\string.h>
 #include "irp.h"
+
+#define BEGIN_DISPATCH_ROUTINE \
+virtual NTSTATUS __forceinline DispatchRoutine(IN IncomingIrp *Irp, IO_STACK_LOCATION *IrpSp){\
+	NTSTATUS status = STATUS_SUCCESS;\
+	switch(IrpSp->MajorFunction){;
+
+#define END_DISPATCH_ROUTINE \
+	default:\
+			return __super::DispatchRoutine(Irp, IrpSp);\
+		}\
+		Irp->SetIoStatus(status);\
+		Irp->CompleteRequest();\
+		return status;}
+
+#define DISPATCH_ROUTINE(Mj, Disp)\
+	case Mj:\
+	status = Disp(Irp,IrpSp);break;
+
+#define BEGIN_DISPATCH_IO_CONTROL\
+	case IRP_MJ_DEVICE_CONTROL:{\
+	ULONG uMethod = METHOD_FROM_CTL_CODE(IrpSp->Parameters.DeviceIoControl.IoControlCode);\
+	ULONG uCode = IrpSp->Parameters.DeviceIoControl.IoControlCode;
+
+#define IO_CONTROL_BUFFERED(code,func)\
+	if (uMethod == METHOD_BUFFERED && uCode == code)\
+	{\
+		status = func(\
+			IrpSp->Parameters.DeviceIoControl.IoControlCode,\
+			Irp->GetSystemBuffer(),\
+			IrpSp->Parameters.DeviceIoControl.InputBufferLength,\
+			Irp->GetSystemBuffer(),\
+			IrpSp->Parameters.DeviceIoControl.OutputBufferLength);break;\
+	}\
+
+#define  END_DISPATCH_IO_CONTROL };break;
+
 namespace msddk { ;
 class CDriver;
 class CDevice
