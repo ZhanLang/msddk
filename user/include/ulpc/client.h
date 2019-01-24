@@ -4,7 +4,6 @@
 #include "winex.h"
 #include <klpc/lpc.h>
 #include <kutil/types.h>
-#include <util/utility.h>
 
 extern "C"
 {
