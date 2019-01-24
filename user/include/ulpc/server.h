@@ -73,14 +73,6 @@ public:
 	}
 	virtual NTSTATUS OnMsg(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
 	{
-		CString strF;
-		strF.Format(L"%d", nOutCch);
-
-		OutputDebugString(strF);
-		WCHAR* strName = L"Ma.Guojun";
-		int nSize = ( wcslen(strName) + 1) * sizeof(WCHAR);
-		memcpy(OutputBuffer, strName, nSize);
-		*OutputLength = nSize;
 		return STATUS_SUCCESS;
 	}
 	

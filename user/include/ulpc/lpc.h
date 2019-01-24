@@ -11,18 +11,7 @@ extern"C"
 
 class CLpcModuleHelp
 {
-	HMODULE m_hModule;
-	typedef void* (_stdcall *p_lpc_server_create)(const wchar_t* name, void* param, lpc_cb cb);
-	typedef void  (_stdcall *p_lpc_server_close)( void* pSvr);
-	typedef int   (_stdcall *p_lpc_send)(const wchar_t* name,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize);
-
-	p_lpc_server_create m_p_lpc_server_create;
-	p_lpc_server_close m_p_lpc_server_close;
-	p_lpc_send m_p_lpc_send;
-
-	
 public:
-
 	void* lpc_server_create(const wchar_t* name, void* param, lpc_cb cb)
 	{
 		if ( m_p_lpc_server_create )
@@ -63,7 +52,11 @@ private:
 
 		if ( IsWindow64() )
 		{
-			_tcscat_s( szModulePath	,_countof(szModulePath),Is64bit()?_T("\\ulpc_64.dll"):_T("\\ulpc_64_32.dll")	);
+#ifdef _WIN64 
+			_tcscat_s( szModulePath	,_countof(szModulePath),_T("\\ulpc_64.dll"));
+#else
+			_tcscat_s( szModulePath	,_countof(szModulePath),_T("\\ulpc_64_32.dll"));
+#endif // _WIN64
 		}
 		else
 		{
@@ -74,18 +67,18 @@ private:
 		if ( !m_hModule )
 			return FALSE;
 
-		m_p_lpc_server_create = (p_lpc_server_create)GetProcAddress(m_hModule,"lpc_server_create");
-		m_p_lpc_server_close= (p_lpc_server_close)GetProcAddress(m_hModule,"lpc_server_close");
-		m_p_lpc_send = (p_lpc_send)GetProcAddress( m_hModule,"lpc_send");
+		m_p_lpc_server_create	= (p_lpc_server_create)GetProcAddress(m_hModule,"lpc_server_create");
+		m_p_lpc_server_close	= (p_lpc_server_close)GetProcAddress(m_hModule,"lpc_server_close");
+		m_p_lpc_send			= (p_lpc_send)GetProcAddress( m_hModule,"lpc_send");
 
 		return TRUE;
 	}
 
 	BOOL FreeLibrary()
 	{
-		m_p_lpc_server_create = NULL;
-		m_p_lpc_server_close = NULL;
-		m_p_lpc_send = NULL;
+		m_p_lpc_server_create	= NULL;
+		m_p_lpc_server_close	= NULL;
+		m_p_lpc_send			= NULL;
 
 		if (m_hModule)
 		{
@@ -208,4 +201,14 @@ _ret:
 		}
 		return path;
 	}
+
+private:
+	HMODULE m_hModule;
+	typedef void* (_stdcall *p_lpc_server_create)(const wchar_t* name, void* param, lpc_cb cb);
+	typedef void  (_stdcall *p_lpc_server_close)( void* pSvr);
+	typedef int   (_stdcall *p_lpc_send)(const wchar_t* name,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize);
+
+	p_lpc_server_create m_p_lpc_server_create;
+	p_lpc_server_close m_p_lpc_server_close;
+	p_lpc_send m_p_lpc_send;
 };
