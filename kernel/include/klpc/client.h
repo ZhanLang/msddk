@@ -1,15 +1,12 @@
 #pragma once
-#include <kutil/string.h>
-
 #include <kutil/memory.h>
-
-
-
+#include <kutil/string.h>
 #include "lpc.h"
 
 namespace msddk { ;
 
-class CKeLpcClient {
+class CKeLpcClient 
+{
 public:
 	CKeLpcClient(LPCWSTR lpszPortName) 
 	{
@@ -36,7 +33,6 @@ public:
 
 	NTSTATUS AskUser(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
 	{
-	
 		NTSTATUS st = STATUS_UNSUCCESSFUL;
 		MYPORT_MESSAGE Msg;
 		KE_FAILED(CreateSection());
@@ -102,8 +98,8 @@ private:
 	NTSTATUS Connect()
 	{
 		NTSTATUS st = STATUS_UNSUCCESSFUL;
+		ULONG	max_msglen = 0;
 
-		ULONG			max_msglen = 0;
 		m_View.Length = sizeof(PORT_VIEW);
 		m_View.SectionHandle = m_hSection;
 		m_View.ViewSize = LARGE_MESSAGE_SIZE;
@@ -120,7 +116,6 @@ private:
 			KdPrint(("CKeLpcClient::Connect(): failed call to ZwConnectPort() (%wS)\n", MapNTStatus(st)));
 			return st;
 		}
-
 
 		return st;
 	}
@@ -142,7 +137,6 @@ private:
 	CKeStringW m_PortName;
 	HANDLE m_hSection;
 	HANDLE m_hPort;
-
 	PORT_VIEW m_View;
 };
 
