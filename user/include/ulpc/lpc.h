@@ -50,19 +50,15 @@ private:
 		TCHAR szModulePath[MAX_PATH] = {0};
 		GetCurrentPath(szModulePath, MAX_PATH);
 
-		if ( IsWindow64() )
-		{
 #ifdef _WIN64 
 			_tcscat_s( szModulePath	,_countof(szModulePath),_T("\\ulpc_64.dll"));
 #else
+		if ( IsWindow64() )
 			_tcscat_s( szModulePath	,_countof(szModulePath),_T("\\ulpc_64_32.dll"));
-#endif // _WIN64
-		}
 		else
-		{
 			_tcscat_s(	szModulePath, _countof(szModulePath),_T("\\ulpc_32.dll")	);
-		}
-
+#endif // _WIN64
+		
 		m_hModule = ::LoadLibrary( szModulePath );
 		if ( !m_hModule )
 			return FALSE;
@@ -119,82 +115,11 @@ private:
 		return FALSE; 
 	}
 
-	BOOL Is64bit()
-	{
-		BOOL	bRtn	= FALSE;
-		HANDLE	hFile	= NULL;
-		LONG	lOffset = 0;
-		DWORD	dwReaded= 0;
-		TCHAR	szMoudlePath[MAX_PATH] = { 0 };
-		IMAGE_DOS_HEADER dosHeader	   = { 0 };
-		IMAGE_FILE_HEADER ifHeader	   = { 0 };
-
-		GetModuleFileName( NULL, szMoudlePath, MAX_PATH );
-
-		hFile = CreateFile(	szMoudlePath , 
-			GENERIC_READ , 
-			FILE_SHARE_READ|FILE_SHARE_WRITE,
-			NULL		 , 
-			OPEN_EXISTING, 
-			FILE_ATTRIBUTE_NORMAL,
-			NULL		 );
-
-		if( hFile == INVALID_HANDLE_VALUE )
-		{
-			return FALSE;
-		}
-
-		if( ReadFile( hFile				, 
-			&dosHeader		, 
-			sizeof(dosHeader)	, 
-			&dwReaded			, 
-			NULL				))
-		{
-			if( dwReaded != sizeof(dosHeader) )
-			{
-				goto _ret;
-			}
-			if( dosHeader.e_magic != IMAGE_DOS_SIGNATURE )
-			{
-				goto _ret;
-			}
-			lOffset = dosHeader.e_lfanew;
-			lOffset += 4;	//定位到IMAGE_FILE_HEADER ??? 不考虑特殊文件
-
-			if( lOffset != SetFilePointer(	hFile	,	 
-				lOffset	, 
-				NULL	, 
-				FILE_BEGIN) )
-			{
-				goto _ret;
-			}
-
-			if(!ReadFile( hFile		, 
-				&ifHeader	,
-				sizeof(IMAGE_FILE_HEADER), 
-				&dwReaded , 
-				NULL    ) )
-			{
-				goto _ret;
-			}
-
-			if(dwReaded == sizeof(IMAGE_FILE_HEADER))
-			{
-				bRtn = (IMAGE_FILE_MACHINE_AMD64 == ifHeader.Machine||
-					IMAGE_FILE_MACHINE_IA64  == ifHeader.Machine );
-			}
-		}
-_ret:
-		CloseHandle(hFile);	
-		return bRtn;
-	}
-
 	LPCTSTR GetCurrentPath( LPTSTR path , DWORD dwLen)
 	{
 		ZeroMemory( path, sizeof(TCHAR)*dwLen );
 		GetModuleFileName( NULL, path, dwLen );
 		TCHAR* pTail = _tcsrchr(path, _T('\\'));
-
 		if ( NULL != pTail )
 		{
 			*pTail = 0;
