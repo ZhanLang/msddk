@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "ulpctest.h"
-#include "ulpc/server.h"
+#include "ulpc/lpc.h"
 
 #define MAX_LOADSTRING 100
 
@@ -18,6 +18,11 @@ BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
+int _stdcall my_lpc_cb(void* param,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize)
+{
+	OutputDebugString(L"lpc_cb");
+	return 0;
+}
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPTSTR    lpCmdLine,
@@ -43,8 +48,12 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ULPCTEST));
 
-	CLpcServer service;
-	service.Init(L"\\LPC_HTTC_PORT");
+	CLpcModuleHelp service;
+	void* pSrv = service.lpc_server_create(L"\\LPC_HTTC_PORT", NULL, my_lpc_cb);
+	if ( !pSrv )
+	{
+		OutputDebugString(L"lpc_server_create error\n");
+	}
 	// 主消息循环:
 	while (GetMessage(&msg, NULL, 0, 0))
 	{

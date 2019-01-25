@@ -28,7 +28,8 @@ public:
 		if ( m_p_lpc_send )
 			return m_p_lpc_send(name, uCode, pInBuf, nInCch, pOutBuf, nOutCch, nOutSize);
 		
-		return STATUS_NOINTERFACE;
+		//STATUS_NOINTERFACE
+		return 0xC00002B9L;
 	}
 
 public:
