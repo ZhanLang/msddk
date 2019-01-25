@@ -86,7 +86,7 @@ public:
 		*/
 
 		CLIENT_MSG cmi = { STATUS_SUCCESS,0,uCode, 1, 0, 0, 0,(int)InputLength,nOutCch};
-		SET_MESSAGE_INFO(&cmi, (VOID*)m_View.ViewBase);
+		
 		if (pInBuffer && InputLength)
 		{
 			SET_MESSAGE_DATA(pInBuffer, InputLength, m_View.ViewBase);
@@ -100,15 +100,17 @@ public:
 			return st;
 		}
 
-		if (OutputBuffer && OutputLength )
-		{
-			int			iMsgSize = GET_MESSAGE_DATA_SIZE(m_View.ViewBase);
-			LPBYTE		pOutMsg  = GET_MESSAGE_DATA_POINT(m_View.ViewBase);
+		PCLIENT_MSG pCltMsg	= GET_MESSAGE_INFO_POINT( (LPVOID)m_View.ViewBase );
+		int			iMsgSize = GET_MESSAGE_DATA_SIZE(m_View.ViewBase);
+
+		if ( OutputLength )
 			*OutputLength = iMsgSize;
-			if (iMsgSize)
-			{
-				memcpy(OutputBuffer, pOutMsg, iMsgSize);
-			}
+		
+		st = pCltMsg->st_result;
+		if (OutputBuffer && iMsgSize)
+		{
+			LPBYTE	pOutMsg  = GET_MESSAGE_DATA_POINT(m_View.ViewBase);	
+			memcpy(OutputBuffer, pOutMsg, iMsgSize);
 		}
 		return st;
 	}

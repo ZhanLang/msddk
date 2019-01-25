@@ -80,16 +80,17 @@ public:
 			return st;
 		}
 
-		if (OutputBuffer && OutputLength)
-		{
-			int			iMsgSize = GET_MESSAGE_DATA_SIZE(m_View.ViewBase);
-			LPBYTE		pOutMsg  = GET_MESSAGE_DATA_POINT(m_View.ViewBase);
+		PCLIENT_MSG pCltMsg = GET_MESSAGE_INFO_POINT(m_View.ViewBase);
+		int			iMsgSize = GET_MESSAGE_DATA_SIZE(m_View.ViewBase);
+
+		if (OutputLength)
 			*OutputLength = iMsgSize;
 
-			if (iMsgSize)
-			{
-				memcpy(OutputBuffer, pOutMsg, iMsgSize);
-			}
+		st = pCltMsg->st_result;
+		if (OutputBuffer && iMsgSize)
+		{
+			LPBYTE	pOutMsg = GET_MESSAGE_DATA_POINT(m_View.ViewBase);
+			memcpy(OutputBuffer, pOutMsg, iMsgSize);
 		}
 		return st;
 	}
