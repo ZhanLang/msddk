@@ -52,7 +52,7 @@ public:
 		}
 	}
 
-	NTSTATUS AskUser(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
+	NTSTATUS AskUser(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength,int* nRet)
 	{
 		NTSTATUS st = STATUS_UNSUCCESSFUL;
 		KE_FAILED(CreateSection());
@@ -106,7 +106,9 @@ public:
 		if ( OutputLength )
 			*OutputLength = iMsgSize;
 		
-		st = pCltMsg->st_result;
+		if( nRet )
+			*nRet = pCltMsg->nRet;
+		
 		if (OutputBuffer && iMsgSize)
 		{
 			LPBYTE	pOutMsg  = GET_MESSAGE_DATA_POINT(m_View.ViewBase);	

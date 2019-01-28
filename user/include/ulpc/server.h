@@ -71,7 +71,7 @@ public:
 		m_threadPool.Initialize(this, 10);
 		return CreatePort();
 	}
-	virtual NTSTATUS OnMsg(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
+	virtual int OnMsg(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
 	{
 		return STATUS_SUCCESS;
 	}
@@ -157,7 +157,7 @@ private:
 					}
 					
 					int nRetSize = 0;
-					pCltMsg->st_result = OnMsg(pCltMsg->nMsgID, pMsgBody, pCltMsg->nMsgSize, pOutMsg, pCltMsg->nRetBufSize, &nRetSize);
+					pCltMsg->nRet = OnMsg(pCltMsg->nMsgID, pMsgBody, pCltMsg->nMsgSize, pOutMsg, pCltMsg->nRetBufSize, &nRetSize);
 					
 					pCltMsg->nMsgSize = nRetSize;
 					SET_MESSAGE_INFO (pCltMsg, (LPVOID)ctxt.view.ViewBase );

@@ -67,7 +67,7 @@ typedef struct _MYPORT_MESSAGE : public PORT_MESSAGE {
 
 typedef struct _CLIENT_MESSAGE_INFO_
 {
-	NTSTATUS	st_result;
+	int			nRet;		/*被调用方返回值*/
 	int			nMsgType;	/*消息类型*/
 	int			nMsgID;		/*消息ID*/
 	int			nProd;		/*产品ID*/

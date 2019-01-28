@@ -12,7 +12,7 @@ public:
 		m_param = param;
 		m_cb = cb;
 	}
-	virtual NTSTATUS OnMsg(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
+	virtual int OnMsg(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
 	{
 		if ( m_cb )
 			return m_cb(m_param,uCode,pInBuffer,InputLength,OutputBuffer,nOutCch,OutputLength );
@@ -52,12 +52,12 @@ extern "C"
 		}
 	}
 
-	int   _stdcall lpc_send(const wchar_t* name,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize)
+	int   _stdcall lpc_send(const wchar_t* name,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize,int* nRet)
 	{
 		if ( !name )
 			return STATUS_INVALID_PARAMETER;
 		
-		return CLpcClient(name).AskUser(uCode, pInBuf, nInCch, pOutBuf, nOutCch, nOutSize);
+		return CLpcClient(name).AskUser(uCode, pInBuf, nInCch, pOutBuf, nOutCch, nOutSize,nRet);
 	}
 };
 
