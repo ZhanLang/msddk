@@ -12,6 +12,10 @@ public:
 		m_param = param;
 		m_cb = cb;
 	}
+	~CExpServer()
+	{
+
+	}
 	virtual int OnMsg(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
 	{
 		if ( m_cb )
@@ -34,7 +38,7 @@ extern "C"
 		CExpServer* pSvr = new CExpServer(param, cb);
 		if ( pSvr )
 		{
-			if ( pSvr->Init(name) != S_OK)
+			if ( pSvr->Create(name) != S_OK)
 			{
 				delete pSvr;
 				pSvr = NULL;
@@ -48,7 +52,8 @@ extern "C"
 		if ( srv )
 		{
 			CExpServer* pSvr = (CExpServer*)srv;
-			delete srv;
+			pSvr->Close();
+			delete pSvr;
 		}
 	}
 

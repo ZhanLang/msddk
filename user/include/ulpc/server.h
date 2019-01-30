@@ -51,18 +51,17 @@ public:
 		return CThreadPool<_Base>::QueueRequest(func);
 	}
 };
-
 class CLpcServer
 {
 public:
 	CLpcServer(void){}
-	~CLpcServer(void)
+	virtual ~CLpcServer(void)
 	{
 		Close();
 	}
 
 public:
-	HRESULT Init(LPCWSTR lpszPortName)
+	HRESULT Create(LPCWSTR lpszPortName)
 	{
 		if ( !(lpszPortName && wcslen(lpszPortName)) )
 			return E_INVALIDARG;
@@ -70,6 +69,16 @@ public:
 		m_strPortName = lpszPortName;
 		m_threadPool.Initialize(this, 10);
 		return CreatePort();
+	}
+	HRESULT Close()
+	{
+		if ( m_hPort )
+		{
+			ZwClose(m_hPort);
+			m_hPort = NULL;
+		}
+		m_threadPool.Shutdown(-1);
+		return S_OK;
 	}
 	virtual int OnMsg(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
 	{
@@ -104,17 +113,7 @@ private:
 		 
 		return hr;
 	}
-	HRESULT Close()
-	{
-		if ( m_hPort )
-		{
-			ZwClose(m_hPort);
-			m_hPort = NULL;
-		}
-
-		m_threadPool.Shutdown(-1);
-		return S_OK;
-	}
+	
 private:
 	VOID Listen()
 	{
@@ -187,13 +186,15 @@ private:
 				}
 				else if (msg_type == LPC_PORT_CLOSED )
 				{
-					if ( hConnectPort )
-					{
-						ZwClose(hConnectPort);
-						hConnectPort = NULL;
-					}
 				}
 			}
+		}
+
+		
+		if ( hConnectPort )
+		{
+			ZwClose(hConnectPort);
+			hConnectPort = NULL;
 		}
 	}
 

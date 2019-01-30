@@ -18,10 +18,12 @@ BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
+int n = 0;
 int _stdcall my_lpc_cb(void* param,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize)
 {
-	OutputDebugString(L"lpc_cb");
-	return 0;
+	OutputDebugString(L"lpc_cb\n");
+	n++;
+	return n;
 }
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -48,8 +50,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ULPCTEST));
 
-	CLpcModuleHelp service;
-	void* pSrv = service.lpc_server_create(L"\\LPC_HTTC_PORT", NULL, my_lpc_cb);
+	
+	void* pSrv = lpc_server_create(L"\\LPC_HTTC_PORT", NULL, my_lpc_cb);
 	if ( !pSrv )
 	{
 		OutputDebugString(L"lpc_server_create error\n");
@@ -63,7 +65,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 	}
-
+	lpc_server_close(pSrv);
 	return (int) msg.wParam;
 }
 

@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "ulpcclient.h"
-#include <ulpc/client.h>
+#include <ulpc/lpc.h>
 
 
 #define MAX_LOADSTRING 100
@@ -47,9 +47,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		TCHAR* szName = L"Ma.guojun";
 		TCHAR OutBuf[MAX_PATH] = { 0 };
 		int nOutSize = 0;
-		CLpcClient(L"\\LPC_HTTC_PORT").AskUser( n, szName, (wcslen(szName)+1)*sizeof(TCHAR), OutBuf, sizeof(OutBuf), &nOutSize);
+		int nRet = 0;
+		lpc_send(L"\\LPC_HTTC_PORT", n, szName, (wcslen(szName)+1)*sizeof(TCHAR), OutBuf, sizeof(OutBuf), &nOutSize,&nRet);
 
-		Sleep(1000);
 		//msddk::CKeLpcClient(L"\\LPC_HTTC_PORT");
 	}
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ULPCCLIENT));

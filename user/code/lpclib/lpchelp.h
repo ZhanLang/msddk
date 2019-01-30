@@ -136,9 +136,9 @@ public:
 
 private:
 	HMODULE m_hModule;
-	typedef void* (_stdcall *p_lpc_server_create)(const wchar_t* name, void* param, lpc_cb cb);
-	typedef void  (_stdcall *p_lpc_server_close)( void* pSvr);
-	typedef int   (_stdcall *p_lpc_send)(const wchar_t* name,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize,int*nRet);
+	typedef void* (__cdecl *p_lpc_server_create)(const wchar_t* name, void* param, lpc_cb cb);
+	typedef void  (__cdecl *p_lpc_server_close)( void* pSvr);
+	typedef int   (__cdecl *p_lpc_send)(const wchar_t* name,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize,int*nRet);
 
 	p_lpc_server_create m_p_lpc_server_create;
 	p_lpc_server_close m_p_lpc_server_close;
