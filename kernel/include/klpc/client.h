@@ -31,7 +31,7 @@ public:
 		}
 	}
 
-	NTSTATUS AskUser(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength,int*nRet )
+	NTSTATUS SendMessage(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength,int*nRet )
 	{
 		NTSTATUS st = STATUS_UNSUCCESSFUL;
 		MYPORT_MESSAGE Msg;
