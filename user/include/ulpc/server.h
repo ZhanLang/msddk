@@ -171,7 +171,7 @@ private:
 				free(pOutMsg);
 			}
 			ZwReplyPort (Ctxt->ClientHandle, &PortMsg );
-			CloseHandle(Ctxt->ClientHandle);
+			ZwClose(Ctxt->ClientHandle);
 			delete Ctxt;
 		}
 		else if ( msg_type == LPC_CONNECTION_REQUEST)
