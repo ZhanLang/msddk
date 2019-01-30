@@ -51,6 +51,7 @@ public:
 		return CThreadPool<_Base>::QueueRequest(func);
 	}
 };
+
 class CLpcServer
 {
 public:
@@ -118,21 +119,15 @@ private:
 	VOID Listen()
 	{
 		NTSTATUS st = STATUS_SUCCESS;
-		HANDLE hConnectPort = NULL;
-		struct client_ctxt {
-			HANDLE commu_port;
-			REMOTE_PORT_VIEW view;
-		} ctxt;
-
-
-		ZeroMemory(&ctxt,sizeof(ctxt));
-		ctxt.view.Length = sizeof( REMOTE_PORT_VIEW );
-		
+		CLIENT_CTXT* Ctxt = NULL;
 		MYPORT_MESSAGE    PortMsg;
 		memset(&PortMsg, 0, sizeof(PortMsg));
 		while( TRUE )
 		{
-			st = ZwReplyWaitReceivePort(m_hPort,(LPVOID*)&ctxt,NULL,&PortMsg);
+			LARGE_INTEGER   Timeout = {0};
+			Timeout.HighPart = 0;
+			Timeout.LowPart  = 1000;
+			st = ZwReplyWaitReceivePort(m_hPort,(LPVOID*)&Ctxt,NULL,&PortMsg);
 			if ( st == STATUS_PORT_CLOSED )
 				break;
 			else if ( st == STATUS_INVALID_HANDLE)
@@ -141,60 +136,57 @@ private:
 				continue;
 			else if ( st == STATUS_SUCCESS )
 			{
-				short msg_type = PortMsg.u2.s2.Type;
-				if ( msg_type == LPC_REQUEST)
-				{
-					m_threadPool.QueueRequest([this]{Listen();});
-					void* pOutMsg		= NULL;
-					PCLIENT_MSG pCltMsg	= GET_MESSAGE_INFO_POINT( (LPVOID)ctxt.view.ViewBase );
-					PBYTE pMsgBody		= GET_MESSAGE_DATA_POINT( (LPVOID)ctxt.view.ViewBase );
+				m_threadPool.QueueRequest([this, PortMsg,Ctxt]{RequestRoutine(PortMsg,Ctxt );});
+			}	
+		}
+	}
 
-					if ( pCltMsg->nRetBufSize )
-					{
-						pOutMsg = malloc( pCltMsg->nRetBufSize );
-						ZeroMemory(pOutMsg, pCltMsg->nRetBufSize);
-					}
-					
-					int nRetSize = 0;
-					pCltMsg->nRet = OnMsg(pCltMsg->nMsgID, pMsgBody, pCltMsg->nMsgSize, pOutMsg, pCltMsg->nRetBufSize, &nRetSize);
-					
-					pCltMsg->nMsgSize = nRetSize;
-					SET_MESSAGE_INFO (pCltMsg, (LPVOID)ctxt.view.ViewBase );
-					if ( pCltMsg->nMsgSize && pOutMsg )
-					{
-						SET_MESSAGE_DATA( pOutMsg,pCltMsg->nMsgSize,(LPVOID)ctxt.view.ViewBase);
-					}
+private:
+	VOID RequestRoutine( MYPORT_MESSAGE PortMsg,CLIENT_CTXT* Ctxt)
+	{
+		short msg_type = PortMsg.u2.s2.Type;
+		if ( msg_type == LPC_REQUEST)
+		{
+			void* pOutMsg		= NULL;
+			PCLIENT_MSG pCltMsg	= GET_MESSAGE_INFO_POINT( (LPVOID)Ctxt->View.ViewBase );
+			PBYTE pMsgBody		= GET_MESSAGE_DATA_POINT( (LPVOID)Ctxt->View.ViewBase );
 
-					if ( pOutMsg )
-					{
-						free(pOutMsg);
-					}
-					ZwReplyPort ( hConnectPort, &PortMsg );
-					break;
-				}
-				else if ( msg_type == LPC_CONNECTION_REQUEST)
-				{
-					st = ZwAcceptConnectPort(&hConnectPort,&ctxt,&PortMsg,TRUE,NULL,&(ctxt.view));
-					if ( st != STATUS_SUCCESS )
-					{
-						ZwAcceptConnectPort(&hConnectPort, &ctxt,&PortMsg, FALSE, 0, 0);
-					}
-					if ( hConnectPort )
-					{
-						ZwCompleteConnectPort(hConnectPort);
-					}
-				}
-				else if (msg_type == LPC_PORT_CLOSED )
-				{
-				}
+			if ( pCltMsg->nRetBufSize )
+			{
+				pOutMsg = malloc( pCltMsg->nRetBufSize );
+				ZeroMemory(pOutMsg, pCltMsg->nRetBufSize);
+			}
+
+			int nRetSize = 0;
+			pCltMsg->nRet = OnMsg(pCltMsg->nMsgID, pMsgBody, pCltMsg->nMsgSize, pOutMsg, pCltMsg->nRetBufSize, &nRetSize);
+
+			pCltMsg->nMsgSize = nRetSize;
+			SET_MESSAGE_INFO (pCltMsg, (LPVOID)Ctxt->View.ViewBase );
+			if ( pCltMsg->nMsgSize && pOutMsg )
+			{
+				SET_MESSAGE_DATA( pOutMsg,pCltMsg->nMsgSize,(LPVOID)Ctxt->View.ViewBase);
+			}
+			if ( pOutMsg )
+			{
+				free(pOutMsg);
+			}
+			ZwReplyPort (Ctxt->ClientHandle, &PortMsg );
+			CloseHandle(Ctxt->ClientHandle);
+			delete Ctxt;
+		}
+		else if ( msg_type == LPC_CONNECTION_REQUEST)
+		{
+			Ctxt = new CLIENT_CTXT;
+			ZeroMemory(Ctxt, sizeof(CLIENT_CTXT));
+			Ctxt->View.Length = sizeof(REMOTE_PORT_VIEW);
+			NTSTATUS st = ZwAcceptConnectPort(&Ctxt->ClientHandle,Ctxt,&PortMsg,TRUE,NULL,&(Ctxt->View));
+			if ( Ctxt->ClientHandle )
+			{
+				ZwCompleteConnectPort(Ctxt->ClientHandle);
 			}
 		}
-
-		
-		if ( hConnectPort )
+		else if (msg_type == LPC_PORT_CLOSED )
 		{
-			ZwClose(hConnectPort);
-			hConnectPort = NULL;
 		}
 	}
 

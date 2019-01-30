@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "ulpcclient.h"
 #include <ulpc/lpc.h>
+#include <thread/threadex.h>
 
 
 #define MAX_LOADSTRING 100
@@ -19,6 +20,20 @@ BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
+VOID Test()
+{
+	for (int n = 0; n < 1000; n++)
+	{
+		TCHAR* szName = L"Ma.guojun";
+		TCHAR OutBuf[MAX_PATH] = { 0 };
+		int nOutSize = 0;
+		int nRet = 0;
+		lpc_send(L"\\LPC_HTTC_PORT", n, szName, (wcslen(szName)+1)*sizeof(TCHAR), OutBuf, sizeof(OutBuf), &nOutSize,&nRet);
+
+		//msddk::CKeLpcClient(L"\\LPC_HTTC_PORT");
+	}
+}
+
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPTSTR    lpCmdLine,
@@ -27,6 +42,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
+	for ( int n = 0 ; n < 50 ; n++)
+	{
+		msdk::CThreadEx().Do([]{Test();});
+	}
  	// TODO: 在此放置代码。
 	MSG msg;
 	HACCEL hAccelTable;
@@ -42,16 +61,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		return FALSE;
 	}
 
-	for (int n = 0; n < 1000; n++)
-	{
-		TCHAR* szName = L"Ma.guojun";
-		TCHAR OutBuf[MAX_PATH] = { 0 };
-		int nOutSize = 0;
-		int nRet = 0;
-		lpc_send(L"\\LPC_HTTC_PORT", n, szName, (wcslen(szName)+1)*sizeof(TCHAR), OutBuf, sizeof(OutBuf), &nOutSize,&nRet);
-
-		//msddk::CKeLpcClient(L"\\LPC_HTTC_PORT");
-	}
+	
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ULPCCLIENT));
 
 	// 主消息循环:

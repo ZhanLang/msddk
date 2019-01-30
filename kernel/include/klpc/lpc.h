@@ -60,8 +60,12 @@ typedef struct _REMOTE_PORT_VIEW {
 } REMOTE_PORT_VIEW, *PREMOTE_PORT_VIEW;
 
 #endif // __WIN_EX__
+
+struct CLIENT_CTXT{
+	HANDLE ClientHandle;
+	REMOTE_PORT_VIEW View;
+};
 typedef struct _MYPORT_MESSAGE : public PORT_MESSAGE {
-	
 	UCHAR Data[100];
 } MYPORT_MESSAGE, *PMYPORT_MESSAGE;
 
