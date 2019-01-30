@@ -52,7 +52,7 @@ public:
 		}
 	}
 
-	NTSTATUS AskUser(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength,int* nRet)
+	NTSTATUS SendMessage(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength,int* nRet)
 	{
 		NTSTATUS st = STATUS_UNSUCCESSFUL;
 		KE_FAILED(CreateSection());
@@ -65,7 +65,7 @@ public:
 
 		if ( !(m_View.ViewBase && m_View.ViewRemoteBase) )
 		{
-			KdPrint(("CKeLpcClient::AskUser(): ViewBase is Null"));
+			KdPrint(("CKeLpcClient::SendMessage(): ViewBase is Null"));
 			return STATUS_INVALID_HANDLE;
 		}
 
@@ -96,7 +96,7 @@ public:
 		st = ZwRequestWaitReplyPort(m_hPort, &Msg, &Msg);
 		if ( !NT_SUCCESS(st) )
 		{
-			KdPrint(("CKeLpcClient::AskUser(): failed call to ZwRequestWaitReplyPort() (%wS)\n", MapNTStatus(st)));
+			KdPrint(("CKeLpcClient::SendMessage(): failed call to ZwRequestWaitReplyPort() (%wS)\n", MapNTStatus(st)));
 			return st;
 		}
 

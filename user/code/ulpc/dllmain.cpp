@@ -26,7 +26,7 @@ private:
 
 extern "C"
 {
-	void* _stdcall lpc_server_create(const wchar_t* name, void* param, lpc_cb cb)
+	void* __cdecl lpc_server_create(const wchar_t* name, void* param, lpc_cb cb)
 	{
 		if ( !cb )
 			return NULL;
@@ -43,7 +43,7 @@ extern "C"
 
 		return pSvr;
 	}
-	void  _stdcall lpc_server_close( void* srv)
+	void  __cdecl lpc_server_close( void* srv)
 	{
 		if ( srv )
 		{
@@ -52,12 +52,12 @@ extern "C"
 		}
 	}
 
-	int   _stdcall lpc_send(const wchar_t* name,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize,int* nRet)
+	int   __cdecl lpc_send(const wchar_t* name,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize,int* nRet)
 	{
 		if ( !name )
 			return STATUS_INVALID_PARAMETER;
 		
-		return CLpcClient(name).AskUser(uCode, pInBuf, nInCch, pOutBuf, nOutCch, nOutSize,nRet);
+		return CLpcClient(name).SendMessage(uCode, pInBuf, nInCch, pOutBuf, nOutCch, nOutSize,nRet);
 	}
 };
 

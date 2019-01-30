@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ulpc", "code\ulpc\ulpc.vcxproj", "{D2D9DC9D-1D6F-454B-AD18-56D1C1DEECAC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lpclib", "code\lpclib\lpclib.vcxproj", "{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		64_32_Debug|Win32 = 64_32_Debug|Win32
@@ -31,6 +33,18 @@ Global
 		{D2D9DC9D-1D6F-454B-AD18-56D1C1DEECAC}.Release|Win32.Build.0 = Release|Win32
 		{D2D9DC9D-1D6F-454B-AD18-56D1C1DEECAC}.Release|x64.ActiveCfg = Release|x64
 		{D2D9DC9D-1D6F-454B-AD18-56D1C1DEECAC}.Release|x64.Build.0 = Release|x64
+		{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}.64_32_Debug|Win32.ActiveCfg = Debug|Win32
+		{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}.64_32_Debug|Win32.Build.0 = Debug|Win32
+		{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}.64_32_Debug|x64.ActiveCfg = Debug|Win32
+		{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}.64_32_Release|Win32.ActiveCfg = Release|Win32
+		{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}.64_32_Release|Win32.Build.0 = Release|Win32
+		{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}.64_32_Release|x64.ActiveCfg = Release|Win32
+		{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}.Debug|Win32.Build.0 = Debug|Win32
+		{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}.Debug|x64.ActiveCfg = Debug|Win32
+		{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}.Release|Win32.ActiveCfg = Release|Win32
+		{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}.Release|Win32.Build.0 = Release|Win32
+		{3C00058C-1D57-4E5A-A6C7-827CA9A0FDD0}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
