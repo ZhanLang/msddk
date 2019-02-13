@@ -22,6 +22,10 @@ int n = 0;
 int _stdcall my_frame_cb(void* param,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize)
 {
 	n++;
+	CString strFormat;
+	strFormat.Format(L"%d\n", n);
+	OutputDebugString(strFormat);
+	Sleep(1000);
 	return n;
 }
 int APIENTRY _tWinMain(HINSTANCE hInstance,
