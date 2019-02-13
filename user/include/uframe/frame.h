@@ -3,6 +3,7 @@
 #define UFRAME_API __declspec(dllexport)
 #else
 #define UFRAME_API __declspec(dllimport)
+#pragma comment(lib,"uframe.lib")
 #endif
 
 typedef int (_stdcall *frame_cb)(void* param,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize);

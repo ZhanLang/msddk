@@ -41,6 +41,7 @@ protected:
 		if (m_Device)
 		{
 			KdPrint(("OnBeforeUnint"));
+			m_Device->DeleteDevice(false);
 			delete m_Device;
 			m_Device = NULL;
 		}

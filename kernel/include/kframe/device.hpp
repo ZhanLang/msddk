@@ -28,7 +28,6 @@ CDevice::CDevice(DEVICE_TYPE DeviceType,
 
 CDevice::~CDevice()
 {
-	DeleteDevice(false);
 }
 
 bool CDevice::Valid()

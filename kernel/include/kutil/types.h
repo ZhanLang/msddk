@@ -9,6 +9,9 @@ typedef unsigned long       DWORD;
 typedef unsigned char		BYTE;
 typedef			 BYTE*		LPBYTE;
 
+#define MAX_PATH			260 	
+#define _countof(_X)		(sizeof(_X)/sizeof(_X[0]))
+
 #define KE_FAILED(x) { NTSTATUS _h_r_ = (x); if(!NT_SUCCESS(_h_r_)) {return _h_r_;} }
 namespace msddk { ;
 

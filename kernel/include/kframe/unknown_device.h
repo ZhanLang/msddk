@@ -8,6 +8,10 @@ public:
 	{
 
 	}
+	virtual ~CUnknownDevcie()
+	{
+
+	}
 };
 
 };

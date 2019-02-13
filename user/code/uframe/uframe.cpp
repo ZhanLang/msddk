@@ -36,12 +36,14 @@ int _stdcall frame_lpc_cb(void* param,int uCode, void *pInBuf, int nInCch, void 
 BOOL CUFrame::Create()
 {
 	CString strLpcName;
-	strLpcName.Format(L"\\\\%s", m_strDrvName);
+	strLpcName.Format(L"\\%s", m_strDrvName);
 	m_lpc = lpc_server_create(strLpcName, this, frame_lpc_cb );
 	if ( !m_lpc )
 	{
 		return FALSE;
 	}
+
+	return TRUE;
 }
 
 VOID CUFrame::Close()
@@ -51,6 +53,7 @@ VOID CUFrame::Close()
 		lpc_server_close(m_lpc);
 		m_lpc = NULL;
 	}
+
 }
 
 HRESULT CUFrame::SendMessage(int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize)
