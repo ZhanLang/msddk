@@ -7,6 +7,9 @@
 #include <kframe/simple_drive.h>
 #include <kframe/unknown_device.h>
 #include <klpc/client.h>
+#include <klog/log.h>
+#include <klog/logworker.h>
+
 
 struct PROC_MSG
 {
@@ -15,6 +18,7 @@ struct PROC_MSG
 };
 
 using namespace msddk;
+CKeLogWorker* pLogWorker;
 class MyDevicer : public CUnknownDevcie
 {
 public:
@@ -79,16 +83,25 @@ public:
 						pOperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~PROCESS_DUP_HANDLE;
 					}
 				}
-
+				//CKeLog(L"\\??\\C:\\1.LOG").Log("dd=%d,cc=%ws\r\n", 1, msg.TargetImagePath);
 				KdPrint(("nRet = %d\n", nRet));
 			}
 		}
+
+		
 		return OB_PREOP_SUCCESS;
 	}
 
 
 	virtual NTSTATUS OnAfterCreate()
 	{
+		pLogWorker = new CKeLogWorker(L"\\??\\C:\\1.LOG");
+		
+		for ( int n = 0 ; n< 100 ; n++)
+		{
+			pLogWorker->PushLog("log worker %d", n);
+		}
+
 		NTSTATUS st = STATUS_SUCCESS;
 		OB_CALLBACK_REGISTRATION obReg = { 0 };
 		obReg.Version = ObGetFilterVersion();

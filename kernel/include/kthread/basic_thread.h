@@ -1,5 +1,5 @@
 #pragma once
-
+#include <kutil/types.h>
 extern "C" NTSYSAPI NTSTATUS NTAPI ZwWaitForSingleObject(
 	__in HANDLE Handle,
 	__in BOOLEAN Alertable,

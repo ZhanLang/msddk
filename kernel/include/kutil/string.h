@@ -619,7 +619,7 @@ int CKeStringBase<T,NTStr,AllocMem,FreeMem>::Format(const T* pstrFormat, ...)
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
 int CKeStringBase<T,NTStr,AllocMem,FreeMem>::FormatV(const char* pszFormat, va_list args )
 {
-	T* szSprintf = NULL;
+	char* szSprintf = NULL;
 	int nLen = 0;
 	nLen = ::_vsnprintf(NULL, 0, pszFormat, args);
 	szSprintf = (char*) AllocMem()((nLen + 1)*sizeof(char));
@@ -633,7 +633,7 @@ int CKeStringBase<T,NTStr,AllocMem,FreeMem>::FormatV(const char* pszFormat, va_l
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
 int CKeStringBase<T,NTStr,AllocMem,FreeMem>::FormatV(const wchar_t * pszFormat, va_list args )
 {
-	T* szSprintf = NULL;
+	wchar_t* szSprintf = NULL;
 	int nLen = 0;
 	nLen = ::_vsnwprintf(NULL, 0, pszFormat, args);
 	szSprintf = (wchar_t*) AllocMem()((nLen + 1)*sizeof(wchar_t));

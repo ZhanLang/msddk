@@ -2,6 +2,7 @@
 #include <kutil/memory.h>
 #include <ksync/spinlock.h>
 #include <ksync/semaphore.h>
+#include <ksync/autlock.h>
 #include "thread.h"
 namespace msddk { ;
 
