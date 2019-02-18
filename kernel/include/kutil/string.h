@@ -1,4 +1,5 @@
 #pragma once
+#include "types.h"
 #include"memory.h"
 
 
@@ -286,14 +287,14 @@ CKeStringBase<T,NTStr,AllocMem,FreeMem>& CKeStringBase<T,NTStr,AllocMem,FreeMem>
 template<typename T, typename NTStr, typename AllocMem, typename FreeMem>
 CKeStringBase<T, NTStr, AllocMem, FreeMem>& CKeStringBase<T, NTStr, AllocMem, FreeMem>::operator=(const PNTStr ntStr)
 {
-	if (ntStr->Length && ntStr->Buffer)
+	if (ntStr && ntStr->Length && ntStr->Buffer)
 	{
-		T* pBuf = GetBufferSetLength(ntStr->Length + sizeof(T));
-		for (USHORT i = 0; i < ntStr->Length; i++)
-		{
-			pBuf[i] = ntStr->Buffer[i];
-		}
-		pBuf[ntStr->Length] = '\0';
+		USHORT uStrlen = ntStr->Length / sizeof(T);
+		T* pBuf = GetBufferSetLength(uStrlen + 1);
+		for (USHORT uLoop = 0; uLoop < uStrlen; uLoop++)
+			pBuf[uLoop] = ntStr->Buffer[uLoop];
+		
+		pBuf[uStrlen] = '\0';
 		ReleaseBuffer();
 	}
 	
@@ -356,9 +357,13 @@ CKeStringBase<T, NTStr, AllocMem, FreeMem>::operator const PNTStr()
 template<typename T,typename NTStr, typename AllocMem,typename FreeMem>
 CKeStringBase<T,NTStr,AllocMem,FreeMem>& CKeStringBase<T,NTStr,AllocMem,FreeMem>::operator+=(const CKeStringBase<T,NTStr,AllocMem,FreeMem> &s)
 {
-	GrowLength(s._length);
-	StringCopy(_chars + _length, s._chars);
-	_length += s._length;
+	if ( s.Length() )
+	{
+		GrowLength(s._length);
+		StringCopy(_chars + _length, s._chars);
+		_length += s._length;
+	}
+	
 	return *this;
 }
 

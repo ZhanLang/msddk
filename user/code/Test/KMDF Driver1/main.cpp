@@ -9,7 +9,7 @@
 #include <klpc/client.h>
 #include <klog/log.h>
 #include <klog/logworker.h>
-
+#include <ktime/time.h>
 
 struct PROC_MSG
 {
@@ -59,6 +59,7 @@ public:
 				CKeProcess::GetProcessImagePath(hCurProcess, sImagePath);
 				KdPrint(("curprocess = %ws\n", sImagePath.GetBuffer()));
 
+				pLogWorker->PushLog("curprocess = %ws\n", sImagePath.GetBuffer());
 
 				PEPROCESS pEprocess = (PEPROCESS)pOperationInformation->Object;
 				CKeStringW sTargetImagePath;
@@ -97,9 +98,13 @@ public:
 	{
 		pLogWorker = new CKeLogWorker(L"\\??\\C:\\1.LOG");
 		
-		for ( int n = 0 ; n< 100 ; n++)
+		UNICODE_STRING SUtl;
+		RtlInitUnicodeString(&SUtl, L"\\??\\C:\\1.LOG");
+		KdPrint(("Length=%d,MaximumLength=%d\n", SUtl.Length, SUtl.MaximumLength));
+
+		for ( int n = 0 ; n< 1 ; n++)
 		{
-			pLogWorker->PushLog("log worker %d", n);
+			pLogWorker->PushLog(CKeTime().GetCurrentTimeString());
 		}
 
 		NTSTATUS st = STATUS_SUCCESS;

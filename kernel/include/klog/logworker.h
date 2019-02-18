@@ -1,5 +1,6 @@
 #pragma once
 #include <kthread/worker_threadex.h>
+#include <ktime/time.h>
 #include "log.h"
 
 namespace msddk { ;
@@ -8,6 +9,7 @@ class CKeLogWorker : public CkeWorkerThreadEx<CKeStringA>
 public:
 	CKeLogWorker(LPCWSTR lpszLog)
 	{
+		m_ullID = 0;
 		m_strLogFile = lpszLog;
 		Start();
 	}
@@ -19,13 +21,28 @@ public:
 		va_start(argList, log);
 		strLog.FormatV(log, argList);
 		va_end(argList);
+		return Push(strLog);
+	}
 
+private:
+	NTSTATUS Push(const char* log)
+	{
+		LONG64 ull = InterlockedIncrement64(&m_ullID);
+		if (MAXULONG64 == ull)
+		{
+			InterlockedExchange64(&m_ullID, 1);
+		}
+		
+		CKeStringA strLog;
+		CKeStringA strTime = CKeTime().GetCurrentTimeString();
+		strLog.Format("[%llu][%s] %s\r\n", ull, strTime.GetBuffer(), log);
 		EnqueueItem(strLog);
-
 		return STATUS_SUCCESS;
 	}
 
 protected:
+
+
 	virtual void DispatchItem(const CKeStringA& item)
 	{
 		KdPrint(("%s",(const char*)item));
@@ -39,6 +56,7 @@ protected:
 	}
 
 	CKeStringW m_strLogFile;
+	LONG64 m_ullID;
 };
 };
 

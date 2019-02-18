@@ -5,7 +5,7 @@
 #include "ulpcclient.h"
 #include <ulpc/lpc.h>
 #include <thread/threadex.h>
-
+#include <util/mststring.h>
 
 #define MAX_LOADSTRING 100
 
@@ -41,6 +41,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+
+	msdk::CApiStringW s1;
+	msdk::CApiStringW ss;
+	ss+= s1;
 
 	for ( int n = 0 ; n < 50 ; n++)
 	{

@@ -43,9 +43,14 @@ public:
 	NTSTATUS Log(const char*log, va_list args)
 	{
 		CKeStringA strLog;
-		IO_STATUS_BLOCK iostatus;
 		strLog.FormatV(log, args);
-		return ZwWriteFile(m_hFile, NULL, NULL, NULL, &iostatus, (void*)strLog.GetBuffer(), strLog.Length(), NULL, NULL);
+		return Log2(strLog);
+	}
+
+	NTSTATUS Log2(const char*log)
+	{
+		IO_STATUS_BLOCK iostatus;
+		return ZwWriteFile(m_hFile, NULL, NULL, NULL, &iostatus, (void*)log, (ULONG)strlen(log), NULL, NULL);
 	}
 
 	~CKeLog()
