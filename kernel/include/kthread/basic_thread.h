@@ -21,6 +21,14 @@ extern "C" NTSTATUS NTAPI ZwQueryInformationThread(HANDLE ThreadHandle,
 	PULONG ReturnLength);
 
 namespace msddk { ;
+
+static void Sleep(unsigned Millisecs)
+{
+	LARGE_INTEGER interval;
+	interval.QuadPart = (ULONGLONG)(-((LONGLONG)Millisecs) * 10000);
+	KeDelayExecutionThread(KernelMode, FALSE, &interval);
+}
+
 template <class DescendantClass>
 class CKeBasicThread
 {
@@ -139,12 +147,7 @@ public:
 		return (DWORD)m_ID.UniqueThread;
 	}
 
-	static void Sleep(unsigned Millisecs)
-	{
-		LARGE_INTEGER interval;
-		interval.QuadPart = (ULONGLONG)(-((LONGLONG)Millisecs) * 10000);
-		KeDelayExecutionThread(KernelMode, FALSE, &interval);
-	}
+	
 
 };
 };

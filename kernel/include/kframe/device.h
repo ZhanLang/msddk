@@ -104,7 +104,8 @@ private:
 
 protected:
 	static NTSTATUS IrpCompletingCompletionRoutine(IN PDEVICE_OBJECT  DeviceObject, IN PIRP Irp, IN PVOID Context);
-private:
+public:
+	PDEVICE_OBJECT m_pDeviceObject;
 
 
 private:
@@ -114,7 +115,7 @@ private:
 	bool m_bDeletePending;
 	bool m_bInterfaceEnabled;
 	ULONG m_AdditionalDeviceFlags;
-	PDEVICE_OBJECT m_pDeviceObject;
+	
 	PDEVICE_OBJECT m_pNextDevice;
 	PDEVICE_OBJECT m_pUnderlyingPDO;
 	UNICODE_STRING m_InterfaceName;

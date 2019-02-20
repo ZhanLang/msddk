@@ -10,6 +10,8 @@
 #include <klog/log.h>
 #include <klog/logworker.h>
 #include <ktime/time.h>
+#include <kthread/member_thread.h>
+#include <kthread/workitem.h>
 
 struct PROC_MSG
 {
@@ -92,12 +94,25 @@ public:
 		
 		return OB_PREOP_SUCCESS;
 	}
+	
 
-
+	NTSTATUS WorkItem(LPVOID lpParam)
+	{
+		UNREFERENCED_PARAMETER(lpParam);
+		KdPrint(("in work item\n"));
+		Sleep(5000);
+		return STATUS_SUCCESS;
+	}
+	
 	virtual NTSTATUS OnAfterCreate()
 	{
 		pLogWorker = new CKeLogWorker(L"\\??\\C:\\1.LOG");
 		
+		KdPrint(("begin work item\n"));
+		CKeWorkItem<MyDevicer>(m_pDeviceObject, this, &MyDevicer::WorkItem).Exec(NULL);
+
+		
+		KdPrint(("end work item\n"));
 		UNICODE_STRING SUtl;
 		RtlInitUnicodeString(&SUtl, L"\\??\\C:\\1.LOG");
 		KdPrint(("Length=%d,MaximumLength=%d\n", SUtl.Length, SUtl.MaximumLength));
