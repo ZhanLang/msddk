@@ -1,7 +1,7 @@
 // dllmain.cpp : 定义 DLL 应用程序的入口点。
 #include "stdafx.h"
 #include <ulpc/client.h>
-#include <ulpc/server.h>
+#include "server.h"
 #include <ulpc/lpc.h>
 
 class CExpServer : public CLpcServer

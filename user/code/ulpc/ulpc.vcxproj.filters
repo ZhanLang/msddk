@@ -30,6 +30,21 @@
     <ClInclude Include="..\..\include\ulpc\lpc.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="server.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ftlFake.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ftlThread.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ftlThreadPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ftlThreadPool.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -39,6 +54,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ftlThread.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

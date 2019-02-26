@@ -18,15 +18,18 @@ BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
-int n = 0;
+LONG nThread = 0;
 int _stdcall my_frame_cb(void* param,int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize)
 {
-	n++;
+
+	LONG l = InterlockedIncrement(&nThread);
 	CString strFormat;
-	strFormat.Format(L"%d\n", n);
+	strFormat.Format(L"%d\n", nThread);
 	OutputDebugString(strFormat);
-	Sleep(1000);
-	return n;
+	Sleep(1);
+	InterlockedDecrement(&nThread);
+	
+	return nThread;
 }
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,

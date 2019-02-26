@@ -1,10 +1,11 @@
 #pragma once
 #include <winternl.h>
 #include <ntstatus.h>
-#include "winex.h"
-#include <atlutil.h>
+#include <ulpc/winex.h>
 #include <functional>
 #include <klpc/lpc.h>
+#include "ftlFake.h"
+#include "ftlThreadPool.h"
 
 extern "C"
 {
@@ -26,29 +27,34 @@ extern "C"
 		__in HANDLE Handle
 		);
 };
-class CThreadPoolWorker
-{
-public:
-	typedef std::function<void()>* RequestType ;
-	virtual BOOL Initialize(void *pvParam){return TRUE;}
-	virtual void Terminate(void* /*pvParam*/){}
 
-	void Execute( RequestType dw, void *pvParam,OVERLAPPED *pOverlapped) throw()
+class CServerJobBase : public FTL::CFJobBase<LPVOID>
+{
+	virtual BOOL Run()
 	{
-		auto func = (RequestType)dw;
+		auto func = (std::function<void()>*)m_JobParam;
 		(*func)();
 		delete func;
+		return TRUE;
+	}
+
+	virtual VOID OnFinalize(IN BOOL isWaiting)
+	{
+		delete this;
 	}
 };
 
+
 template<class _Base>
-class CThreadPoolEx: public CThreadPool<_Base>
+class CThreadPoolEx: public FTL::CFThreadPool<_Base>
 {
 public:
 	BOOL QueueRequest(const std::function<void()> &f)
 	{
-		auto func = new std::function<void()>(f);
-		return CThreadPool<_Base>::QueueRequest(func);
+		LPVOID func = new std::function<void()>(f);
+		CServerJobBase* work = new CServerJobBase();
+		work->m_JobParam = func;
+		return FTL::CFThreadPool<_Base>::SubmitJob(work,NULL);
 	}
 };
 class CLpcServer
@@ -67,7 +73,7 @@ public:
 			return E_INVALIDARG;
 
 		m_strPortName = lpszPortName;
-		m_threadPool.Initialize(this, 5);
+		m_threadPool.Start(3, 1000);
 		return CreatePort();
 	}
 	HRESULT Close()
@@ -77,7 +83,7 @@ public:
 			ZwClose(m_hPort);
 			m_hPort = NULL;
 		}
-		m_threadPool.Shutdown(-1);
+		m_threadPool.StopAndWait(-1);
 		return S_OK;
 	}
 	virtual int OnMsg(int uCode, void *pInBuffer, int InputLength, void * OutputBuffer, int nOutCch, int* OutputLength)
@@ -189,7 +195,7 @@ private:
 	}
 
 private:
-	CThreadPoolEx<CThreadPoolWorker> m_threadPool;
+	CThreadPoolEx<LPVOID> m_threadPool;
 	CString m_strPortName;
 	HANDLE m_hPort;
 };

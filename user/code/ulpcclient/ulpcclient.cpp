@@ -22,7 +22,7 @@ INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
 VOID Test()
 {
-	for (int n = 0; n < 1000; n++)
+	for (int n = 0; n < 100; n++)
 	{
 		TCHAR* szName = L"Ma.guojun";
 		TCHAR OutBuf[MAX_PATH] = { 0 };
