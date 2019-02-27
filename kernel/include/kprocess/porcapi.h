@@ -2,6 +2,7 @@
 #include <ntifs.h>
 #include <kutil/string.h>
 #include <kutil/types.h>
+#include <kfile/path.h>
 
 typedef NTSTATUS(*QUERY_INFO_PROCESS) (
 	__in HANDLE ProcessHandle,
@@ -15,7 +16,7 @@ namespace msddk {;
 
 class CKeProcess {
 public:
-	static NTSTATUS GetProcessImagePath(IN PEPROCESS pEprocess, CKeStringW& ImagePath)
+	static NTSTATUS GetProcessImagePath(PEPROCESS pEprocess, CKeStringW& ImagePath)
 	{
 		HANDLE hProcess = NULL;
 		NTSTATUS Status = STATUS_SUCCESS;
@@ -86,6 +87,26 @@ public:
 			return Status;
 
 		return GetProcessImagePath(pEprocess, ImagePath);
+	}
+
+	static NTSTATUS GetProcessDosFileName(HANDLE dwProcessId, CKeStringW& ImagePath)
+	{
+		NTSTATUS status = GetProcessImagePath(dwProcessId, ImagePath);
+		if ( NT_SUCCESS(status ))
+		{
+			return CKePath::NtFileNameToDosFileName(ImagePath, ImagePath);
+		}
+		return status;
+	}
+
+	static NTSTATUS GetProcessDosFileName(PEPROCESS pEprocess, CKeStringW& ImagePath)
+	{
+		NTSTATUS status = GetProcessImagePath(pEprocess, ImagePath);
+		if (NT_SUCCESS(status))
+		{
+			return CKePath::NtFileNameToDosFileName(ImagePath, ImagePath);
+		}
+		return status;
 	}
 };
 

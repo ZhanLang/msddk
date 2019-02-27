@@ -1,6 +1,3 @@
 #pragma once
-namespace msddk { ; 
-
-
-
-};
+#include <kutil/memory.hpp>
+#include <kfile/path.hpp>

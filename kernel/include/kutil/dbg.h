@@ -6,7 +6,7 @@ namespace msddk { ;
 
 
 
- const wchar_t *MapNTStatus(NTSTATUS Status)
+static const wchar_t *MapNTStatus(NTSTATUS Status)
 {
 	switch (Status)
 	{
