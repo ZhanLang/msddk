@@ -62,14 +62,15 @@ NTSTATUS CDriver::DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING Regis
 	NTSTATUS st = DriverLoad(RegistryPath);
 	if ( !NT_SUCCESS( st ) )
 	{
-		KdPrint(("CDriver::DriverEntry(): failed call to DriverLoad() (%wS)\n", MapNTStatus(st)));
+		KdPrint(("CDriver::DriverLoad()->DriverEntry Failed.(%wS)\n", MapNTStatus(st)));
 		return st;
 	}
 
 	st = OnAfterInit();
 	if ( !NT_SUCCESS( st ) )
 	{
-		KdPrint(("CDriver::DriverEntry(): failed call to OnAfterInit() (%wS)\n", MapNTStatus(st)));
+		OnBeforeUnint();
+		KdPrint(("CDriver::DriverEntry()->OnAfterInit: failed(%wS)\n", MapNTStatus(st)));
 	}
 	return st;
 }
@@ -91,6 +92,7 @@ VOID CDriver::sDriverUnload(IN PDRIVER_OBJECT DriverObject)
 	UNREFERENCED_PARAMETER(DriverObject);
 	if ( s_MainDriver )
 	{
+		KdPrint(("CDriver::sDriverUnload\n"));
 		NTSTATUS st = s_MainDriver->OnBeforeUnint();
 		if ( !NT_SUCCESS( st ) )
 		{
