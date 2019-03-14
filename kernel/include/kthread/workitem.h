@@ -3,10 +3,11 @@
 #include <ksync/event.h>
 namespace msddk { ;
 
-template<class T>
-class CKeWorkItem
+
+template<class T,class P>
+class CKeWorkItem:public NonPagedObject
 {
-	typedef NTSTATUS (T::*P_INVOKER)( LPVOID lpParam);
+	typedef NTSTATUS (T::*P_INVOKER)(P* lpParam);
 public:
 	CKeWorkItem(PDEVICE_OBJECT pDeviceObject, T* pOwer, P_INVOKER Invoker)
 	{
@@ -19,7 +20,7 @@ public:
 	{
 	}
 public:
-	NTSTATUS Exec(LPVOID lpParam)
+	NTSTATUS Exec(P* lpParam)
 	{
 		m_lpParam = lpParam;
 		PIO_WORKITEM pIoWorkItem = IoAllocateWorkItem(m_pDeviceObject);
@@ -45,7 +46,7 @@ private:
 private:
 	CKeEvent m_event;
 	void* m_pOwer;
-	LPVOID m_lpParam;
+	P* m_lpParam;
 	P_INVOKER m_pInvoker;
 	NTSTATUS m_st;
 	PDEVICE_OBJECT m_pDeviceObject;

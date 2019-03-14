@@ -28,6 +28,11 @@ public:
 		return strTime;
 	}
 
+	static LONGLONG GetMillisecs( UINT nSecs)
+	{
+		return (ULONGLONG)(-((LONGLONG)nSecs) * 10000);
+	}
+
 private:
 	LARGE_INTEGER GelinTime;
 	LARGE_INTEGER LocalTime;

@@ -22,7 +22,7 @@ extern "C" NTSTATUS NTAPI ZwQueryInformationThread(HANDLE ThreadHandle,
 
 namespace msddk { ;
 
-static void Sleep(unsigned Millisecs)
+static inline void Sleep(unsigned Millisecs)
 {
 	LARGE_INTEGER interval;
 	interval.QuadPart = (ULONGLONG)(-((LONGLONG)Millisecs) * 10000);

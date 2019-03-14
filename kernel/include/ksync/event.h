@@ -1,5 +1,5 @@
 #pragma once
-
+#include <kutil/memory.h>
 namespace msddk { ;
 
 enum EventType
@@ -8,7 +8,7 @@ enum EventType
 	kAutoResetEvent,
 };
 
-class CKeEvent
+class CKeEvent:NonPagedObject
 {
 private:
 	KEVENT * m_pEvent;
@@ -85,9 +85,10 @@ public:
 		KPROCESSOR_MODE WaitMode = KernelMode,
 		bool Alertable = false)
 	{
+		
 		ASSERT(Valid());
 		LARGE_INTEGER liTimeout;
-		liTimeout.QuadPart = -Timeout;
+		liTimeout.QuadPart = Timeout;
 		return KeWaitForSingleObject(m_pEvent, WaitReason, WaitMode, Alertable, &liTimeout);
 	}
 	operator PKEVENT()

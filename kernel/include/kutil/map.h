@@ -1,18 +1,18 @@
 #pragma once
 
-#include"types.h"
+#include "memory.h"
 namespace msddk{;
 
 
-template<class KEY, class TYPE> 
-class CKeMapNode
+template<class KEY, class TYPE,class M> 
+class CKeMapNode : public M
 {
 public:
 	TYPE    Value;
 	KEY	    Key;
 
 public:
-	typedef CKeMapNode<KEY,TYPE> Node;
+	typedef CKeMapNode<KEY,TYPE,M> Node;
 	enum  NodeColor {RED,BLACK};
 	Node *  Parent;
 	Node *  RightChild;
@@ -22,11 +22,11 @@ public:
 	
 };
 
-template<class KEY, class TYPE> 
-class CKeMapIterator								//为了支持对map进行按升序或降序遍历
+template<class KEY, class TYPE,class M> 
+class CKeMapIterator:public M								//为了支持对map进行按升序或降序遍历
 {
 public:
-	typedef CKeMapNode<KEY,TYPE> Node;
+	typedef CKeMapNode<KEY,TYPE,M> Node;
 	Node * pRBT_Node;
 	CKeMapIterator(){pRBT_Node=NULL;};
 	CKeMapIterator(Node* pNode){pRBT_Node=pNode;};
@@ -49,13 +49,13 @@ struct CKeMapNodLess
 	}
 };
 
-template<class KEY, class TYPE, class _CMP = CKeMapNodLess<KEY>> 
-class CKeMap
+template<class KEY, class TYPE,class M=PagedObject , class _CMP = CKeMapNodLess<KEY>> 
+class CKeMap : public M
 {
 public:
-	typedef CKeMapIterator<KEY,TYPE> Iterator;
-	typedef CKeMapNode<KEY,TYPE>*     ValueType;
-	typedef CKeMapNode<KEY,TYPE> Node;
+	typedef CKeMapIterator<KEY,TYPE,M> Iterator;
+	typedef CKeMapNode<KEY,TYPE,M>*     ValueType;
+	typedef CKeMapNode<KEY,TYPE,M> Node;
 	inline unsigned int Count();
 	
 	CKeMap();
@@ -95,8 +95,8 @@ for (; it ; it++)
 CKeMap<CApiString,CApiString>::ValueType value = strMap.Find(_T("2"));
 */
 /*_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-*/
-template<class KEY, class TYPE> 
-void CKeMapIterator<KEY,TYPE>::Increment()			
+template<class KEY, class TYPE,class M> 
+void CKeMapIterator<KEY,TYPE,M>::Increment()			
 {
 	if(pRBT_Node==NULL)
 		return;
@@ -123,8 +123,8 @@ void CKeMapIterator<KEY,TYPE>::Increment()
 	}
 }
 
-template<class KEY, class TYPE> 
-void CKeMapIterator<KEY,TYPE>::Decrement()
+template<class KEY, class TYPE,class M> 
+void CKeMapIterator<KEY,TYPE,M>::Decrement()
 {
 	if(pRBT_Node==NULL)
 		return;
@@ -152,8 +152,8 @@ void CKeMapIterator<KEY,TYPE>::Decrement()
 }
 
 /*_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-*/
-template<class KEY, class TYPE, class _CMP> 
-CKeMapNode<KEY,TYPE>*  CKeMap<KEY,TYPE,_CMP>::Min() const
+template<class KEY, class TYPE, class M,class _CMP> 
+CKeMapNode<KEY,TYPE,M>*  CKeMap<KEY,TYPE,M,_CMP>::Min() const
 {
 	Node* pResult=m_Head;
 	if(!pResult->IsSnil)
@@ -167,8 +167,8 @@ CKeMapNode<KEY,TYPE>*  CKeMap<KEY,TYPE,_CMP>::Min() const
 	return pResult;
 }
 
-template<class KEY, class TYPE, class _CMP> 
-CKeMapNode<KEY,TYPE>*  CKeMap<KEY,TYPE,_CMP>::Max() const 
+template<class KEY, class TYPE, class M,class _CMP> 
+CKeMapNode<KEY,TYPE,M>*  CKeMap<KEY,TYPE,M,_CMP>::Max() const 
 {
 	Node* pResult=m_Head;
 	if(!pResult->IsSnil)
@@ -182,8 +182,8 @@ CKeMapNode<KEY,TYPE>*  CKeMap<KEY,TYPE,_CMP>::Max() const
 	return pResult;
 }
 
-template<class KEY, class TYPE, class _CMP> 
-CKeMapNode<KEY,TYPE>*  CKeMap<KEY,TYPE,_CMP>::Find(const KEY& Key)
+template<class KEY, class TYPE, class M,class _CMP> 
+CKeMapNode<KEY,TYPE,M>*  CKeMap<KEY,TYPE,M,_CMP>::Find(const KEY& Key)
 {
 	Node* pResult=m_Head;
 	while(!pResult->IsSnil)
@@ -203,8 +203,8 @@ CKeMapNode<KEY,TYPE>*  CKeMap<KEY,TYPE,_CMP>::Find(const KEY& Key)
 	return pResult;
 }
 
-template<class KEY, class TYPE, class _CMP> 
-BOOL  CKeMap<KEY,TYPE,_CMP>::Insert(const KEY& Key, const TYPE& Value)
+template<class KEY, class TYPE, class M,class _CMP> 
+BOOL  CKeMap<KEY,TYPE,M,_CMP>::Insert(const KEY& Key, const TYPE& Value)
 {
 	Node * TreeNode,*InsertPoint,*NewNode;
 	TreeNode=m_Head;
@@ -297,8 +297,8 @@ BOOL  CKeMap<KEY,TYPE,_CMP>::Insert(const KEY& Key, const TYPE& Value)
 	return TRUE;
 }
 
-template<class KEY, class TYPE, class _CMP> 
-CKeMap<KEY,TYPE,_CMP>::CKeMap()
+template<class KEY, class TYPE, class M,class _CMP> 
+CKeMap<KEY,TYPE,M,_CMP>::CKeMap()
 {
 	m_Snil.IsSnil=TRUE;
 	m_Snil.LelfChild=NULL;
@@ -307,8 +307,8 @@ CKeMap<KEY,TYPE,_CMP>::CKeMap()
 	m_Head=&m_Snil;m_Count=0;
 };
 
-template<class KEY, class TYPE, class _CMP> 
-CKeMap<KEY,TYPE,_CMP>::CKeMap(const CKeMap<KEY,TYPE,_CMP>& t)
+template<class KEY, class TYPE, class M,class _CMP> 
+CKeMap<KEY,TYPE,M,_CMP>::CKeMap(const CKeMap<KEY,TYPE,M,_CMP>& t)
 {
 	m_Snil.IsSnil		=TRUE;
 	m_Snil.LelfChild	=NULL;
@@ -320,14 +320,14 @@ CKeMap<KEY,TYPE,_CMP>::CKeMap(const CKeMap<KEY,TYPE,_CMP>& t)
 	*this = t;
 }
 
-template<class KEY, class TYPE, class _CMP> 
-CKeMap<KEY,TYPE,_CMP>::~CKeMap()
+template<class KEY, class TYPE, class M,class _CMP> 
+CKeMap<KEY,TYPE,M,_CMP>::~CKeMap()
 {
 	Clear();
 };
 
-template<class KEY, class TYPE, class _CMP> 
-BOOL CKeMap<KEY,TYPE,_CMP>::Remove(const KEY& Key)
+template<class KEY, class TYPE, class M,class _CMP> 
+BOOL CKeMap<KEY,TYPE,M,_CMP>::Remove(const KEY& Key)
 {
 	Node * DeleteNode,*TreeNode,*R;
 	DeleteNode=m_Head;
@@ -384,8 +384,8 @@ BOOL CKeMap<KEY,TYPE,_CMP>::Remove(const KEY& Key)
 }
 
 
-template<class KEY, class TYPE, class _CMP> 
-VOID CKeMap<KEY,TYPE,_CMP>::DeleteTree(Node *TreeNode)
+template<class KEY, class TYPE, class M,class _CMP> 
+VOID CKeMap<KEY,TYPE,M,_CMP>::DeleteTree(Node *TreeNode)
 {
 	if(TreeNode->IsSnil)
 		return ;
@@ -399,8 +399,8 @@ VOID CKeMap<KEY,TYPE,_CMP>::DeleteTree(Node *TreeNode)
 	delete TreeNode;
 }
 
-template<class KEY, class TYPE, class _CMP> 
-VOID CKeMap<KEY,TYPE,_CMP>::LeftRotate(Node * TreeNode)
+template<class KEY, class TYPE, class M,class _CMP> 
+VOID CKeMap<KEY,TYPE,M,_CMP>::LeftRotate(Node * TreeNode)
 {
 	Node * Rotate_Right;
 	Rotate_Right=TreeNode->RightChild;
@@ -422,8 +422,8 @@ VOID CKeMap<KEY,TYPE,_CMP>::LeftRotate(Node * TreeNode)
 	TreeNode->Parent=Rotate_Right;
 }
 
-template<class KEY, class TYPE, class _CMP> 
-VOID CKeMap<KEY,TYPE,_CMP>::RightRotate(Node * TreeNode)
+template<class KEY, class TYPE, class M,class _CMP> 
+VOID CKeMap<KEY,TYPE,M,_CMP>::RightRotate(Node * TreeNode)
 {
 	Node * Rotate_Left;
 	Rotate_Left=TreeNode->LelfChild;
@@ -444,8 +444,8 @@ VOID CKeMap<KEY,TYPE,_CMP>::RightRotate(Node * TreeNode)
 	TreeNode->Parent=Rotate_Left;
 }
 
-template<class KEY, class TYPE, class _CMP> 
-VOID CKeMap<KEY,TYPE,_CMP>::DeleteFixUp(Node * TreeNode)
+template<class KEY, class TYPE, class M,class _CMP> 
+VOID CKeMap<KEY,TYPE,M,_CMP>::DeleteFixUp(Node * TreeNode)
 {
 	Node * Brother;
 	while(TreeNode!=m_Head&&TreeNode->Color==Node::BLACK)
@@ -522,25 +522,25 @@ VOID CKeMap<KEY,TYPE,_CMP>::DeleteFixUp(Node * TreeNode)
 	TreeNode->Color=Node::BLACK;
 }
 
-template<class KEY, class TYPE, class _CMP> 
-VOID CKeMap<KEY,TYPE,_CMP>::Clear()
+template<class KEY, class TYPE, class M,class _CMP> 
+VOID CKeMap<KEY,TYPE,M,_CMP>::Clear()
 {
 	DeleteTree(m_Head);
 	m_Head=&m_Snil;
 	m_Count=0;
 }
 
-template<class KEY, class TYPE, class _CMP> 
-inline UINT CKeMap<KEY,TYPE,_CMP>::Count()
+template<class KEY, class TYPE, class M,class _CMP> 
+inline UINT CKeMap<KEY,TYPE,M,_CMP>::Count()
 {
 	return m_Count;
 }
 
-template<class KEY, class TYPE, class _CMP> 
-CKeMap<KEY,TYPE,_CMP>& CKeMap<KEY,TYPE,_CMP>::operator= (const CKeMap<KEY,TYPE,_CMP>& t)
+template<class KEY, class TYPE, class M,class _CMP> 
+CKeMap<KEY,TYPE,M,_CMP>& CKeMap<KEY,TYPE,M,_CMP>::operator= (const CKeMap<KEY,TYPE,M,_CMP>& t)
 {
 	Clear();
-	CKeMap<KEY,TYPE,_CMP>::Iterator it = t.Min();
+	CKeMap<KEY,TYPE,M,_CMP>::Iterator it = t.Min();
 	for (; it; it++)
 	{
 		Insert(KEY(it->Key),TYPE(it->Value));
