@@ -2,34 +2,23 @@
 #include "memory.h"
 namespace msddk{;
 
-struct VectorPagePool : public PagedObject
-{
-	VOID* Malloc(size_t size)
-	{
+struct VectorPagePool : public PagedObject{
+	VOID* Malloc(size_t size){
 		return ExAllocatePoolWithTag(PagedPool, size, 'VPag');
 	}
-	VOID Free(VOID* lpVoid)
-	{
+	VOID Free(VOID* lpVoid){
 		if (lpVoid)
-		{
 			ExFreePoolWithTag(lpVoid, 'VPag');
-		}
 	}
 };
 
-struct VectorNonPagePool : public NonPagedObject
-{
-	VOID* Malloc(size_t size)
-	{
+struct VectorNonPagePool : public NonPagedObject{
+	VOID* Malloc(size_t size){
 		return ExAllocatePoolWithTag(NonPagedPool, size, 'VNPa');
 	}
-
-	VOID Free(VOID* lpVoid)
-	{
+	VOID Free(VOID* lpVoid){
 		if (lpVoid)
-		{
 			ExFreePoolWithTag(lpVoid, 'VNPa');
-		}
 	}
 };
 
@@ -67,7 +56,7 @@ private:
 
 
 template<typename T, class M = VectorPagePool>
-class  CKeVectorBase: public CKeVectorBaseImp<T,M>, public M
+class  CKeVectorBase: public CKeVectorBaseImp<T,M>
 {
 public:
 	CKeVectorBase();
@@ -91,7 +80,7 @@ public:
 };
 
 template <class T, class M = VectorPagePool>
-class CKeVector: public CKeVectorBase<void*,M>, public M
+class CKeVector: public CKeVectorBase<void*,M>
 {
 public:
 	CKeVector() ;
@@ -175,7 +164,7 @@ bool CKeVectorBaseImp<T,M>::Reserve(int newCapacity)
 	unsigned char *p = NULL;
 	if (newSize > 0)
 	{
-		p = Malloc(newSize);
+		p = (unsigned char*)Malloc(newSize);
 		if (p == 0)
 			return false;
 
@@ -466,7 +455,7 @@ CKeVector<T,M>::~CKeVector()
 
 template<typename T,typename M>
 CKeVector<T,M>::CKeVector(const CKeVector &v)
-	: CKeVectorBase<void*>() 
+	: CKeVectorBase<void*,M>() 
 { 
 	*this = v; 
 }
@@ -492,13 +481,13 @@ CKeVector<T,M>& CKeVector<T,M>::operator+=(const CKeVector &v)
 template<typename T,typename M> 
 const T& CKeVector<T,M>::operator[](int index) const 
 {
-	return *((T *)CKeVectorBase<void*>::operator[](index)); 
+	return *((T *)CKeVectorBase<void*,M>::operator[](index)); 
 }
 
 template<typename T,typename M> 
 T& CKeVector<T,M>::operator[](int index) 
 {
-	return *((T *)CKeVectorBase<void*>::operator[](index)); 
+	return *((T *)CKeVectorBase<void*,M>::operator[](index)); 
 }
 
 template<typename T,typename M> 
@@ -528,13 +517,13 @@ const T& CKeVector<T,M>::Back() const
 template<typename T,typename M> 
 int CKeVector<T,M>::Add(const T& item) 
 {
-	return CKeVectorBase<void*>::Add(new T(item)); 
+	return CKeVectorBase<void*,M>::Add(new T(item)); 
 }
 
 template<typename T,typename M> 
 void CKeVector<T,M>::Insert(int index, const T& item) 
 {
-	CKeVectorBase<void*>::Insert(index, new T(item)); 
+	CKeVectorBase<void*,M>::Insert(index, new T(item)); 
 }
 
 template<typename T,typename M> 
@@ -543,7 +532,7 @@ void CKeVector<T,M>::Delete(int index, int num /*= 1*/)
 	TestIndexAndCorrectNum(index, num);
 	for (int i = 0; i < num; i++)
 		delete (T *)(((void **)_items)[index + i]);
-	CKeVectorBase<void*>::Delete(index, num);
+	CKeVectorBase<void*,M>::Delete(index, num);
 }
 
 template<typename T,typename M> 
@@ -598,7 +587,7 @@ int CKeVector<T,M>::AddToSorted(const T& item)
 template<typename T,typename M> 
 void CKeVector<T,M>::Sort(int (*compare)(void *const *, void *const *, void *), void *param)
 {
-	CKeVectorBase<void*>::Sort(compare, param); 
+	CKeVectorBase<void*,M>::Sort(compare, param); 
 }
 
 template<typename T,typename M> 
@@ -610,7 +599,7 @@ static int CKeVector<T,M>::CompareObjectItems(void *const *a1, void *const *a2, 
 template<typename T,typename M> 
 void CKeVector<T,M>::Sort() 
 {
-	CKeVectorBase<void*>::Sort(CompareObjectItems, 0); 
+	CKeVectorBase<void*,M>::Sort(CompareObjectItems, 0); 
 }
 
 

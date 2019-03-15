@@ -5,35 +5,23 @@
 
 namespace msddk{;
 
-
-struct StrPageMem : public PagedObject
-{
-	VOID* Malloc(size_t size)
-	{
+struct StrPageMem : public PagedObject{
+	VOID* Malloc(size_t size){
 		return ExAllocatePoolWithTag(PagedPool, size, 'SPag');
 	}
-	VOID Free(VOID* lpVoid)
-	{
+	VOID Free(VOID* lpVoid){
 		if (lpVoid)
-		{
 			ExFreePoolWithTag(lpVoid, 'SPag');
-		}
 	}
 };
 
-struct StrNonPageMem : public NonPagedObject
-{
-	VOID* Malloc(size_t size)
-	{
+struct StrNonPageMem : public NonPagedObject{
+	VOID* Malloc(size_t size){
 		return ExAllocatePoolWithTag(NonPagedPool, size, 'SNPa');
 	}
-
-	VOID Free(VOID* lpVoid)
-	{
+	VOID Free(VOID* lpVoid){
 		if (lpVoid)
-		{
 			ExFreePoolWithTag(lpVoid, 'SNPa');
-		}
 	}
 };
 

@@ -12,16 +12,14 @@
 #include <ktime/time.h>
 #include <kthread/member_thread.h>
 #include <kthread/workitem.h>
+#include <kutil/vector.h>
+#include <kutil/map.h>
 
-struct PROC_MSG
-{
-	WCHAR SourceImagePath[MAX_PATH];
-	WCHAR TargetImagePath[MAX_PATH];
-};
+#include <kutil/memory.hpp>
 
 using namespace msddk;
 CKeLogWorker* pLogWorker;
-class MyDevicer : public CUnknownDevcie
+class MyDevicer : public CUnknownDevcie 
 {
 public:
 	MyDevicer()
@@ -34,132 +32,30 @@ public:
 	}
 
 
-	static OB_PREOP_CALLBACK_STATUS
-		obPreCall(
-			PVOID RegistrationContext,
-			POB_PRE_OPERATION_INFORMATION pOperationInformation
-		)
-	{
-		UNREFERENCED_PARAMETER(RegistrationContext);
-		UNREFERENCED_PARAMETER(pOperationInformation);
-		ULONG oper = pOperationInformation->Operation;
-
-
-		if ( oper == OB_OPERATION_HANDLE_CREATE )
-		{
-			ULONG oriAcess = pOperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess;
-
-			if (oriAcess == PROCESS_ALL_ACCESS)
-			{
-				return OB_PREOP_SUCCESS;
-			}
-
-			if (oriAcess & 0x0001 /*PROCESS_TERMINATE*/ || oriAcess & PROCESS_DUP_HANDLE)
-			{
-				HANDLE hCurProcess = PsGetCurrentProcessId();
-				CKeStringW sImagePath;
-				CKeProcess::GetProcessImagePath(hCurProcess, sImagePath);
-				KdPrint(("curprocess = %ws\n", sImagePath.GetBuffer()));
-
-				pLogWorker->PushLog("curprocess = %ws\n", sImagePath.GetBuffer());
-
-				PEPROCESS pEprocess = (PEPROCESS)pOperationInformation->Object;
-				CKeStringW sTargetImagePath;
-				CKeProcess::GetProcessImagePath(pEprocess, sTargetImagePath);
-				KdPrint(("sTargetImagePath = %ws\n", sTargetImagePath.GetBuffer()));
-
-				PROC_MSG msg = { 0 };
-				wcscpy_s(msg.TargetImagePath, _countof(msg.TargetImagePath), sTargetImagePath.GetBuffer());
-				wcscpy_s(msg.SourceImagePath, _countof(msg.SourceImagePath), sImagePath.GetBuffer());
-
-				INT nRet = -1;
-				CKeLpcClient(L"\\ProcMsg").SendMessage(0, &msg, sizeof(msg), NULL, 0, NULL, &nRet);
-
-				if ( nRet == 1)
-				{
-					if (oriAcess & 0x0001 )
-					{
-						pOperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~0x0001;
-					}
-					if (oriAcess & PROCESS_DUP_HANDLE)
-					{
-						pOperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~PROCESS_DUP_HANDLE;
-					}
-				}
-				//CKeLog(L"\\??\\C:\\1.LOG").Log("dd=%d,cc=%ws\r\n", 1, msg.TargetImagePath);
-				KdPrint(("nRet = %d\n", nRet));
-			}
-		}
-
-		
-		return OB_PREOP_SUCCESS;
-	}
-	
-
-	NTSTATUS WorkItem(LPVOID lpParam)
-	{
-		UNREFERENCED_PARAMETER(lpParam);
-		KdPrint(("in work item\n"));
-		Sleep(5000);
-		return STATUS_SUCCESS;
-	}
-	
 	virtual NTSTATUS OnAfterCreate()
 	{
-		pLogWorker = new CKeLogWorker(L"\\??\\C:\\1.LOG");
-		
-		KdPrint(("begin work item\n"));
-		CKeWorkItem<MyDevicer>(m_pDeviceObject, this, &MyDevicer::WorkItem).Exec(NULL);
-
-		
-		KdPrint(("end work item\n"));
-		UNICODE_STRING SUtl;
-		RtlInitUnicodeString(&SUtl, L"\\??\\C:\\1.LOG");
-		KdPrint(("Length=%d,MaximumLength=%d\n", SUtl.Length, SUtl.MaximumLength));
-
-		for ( int n = 0 ; n< 1 ; n++)
-		{
-			pLogWorker->PushLog(CKeTime().GetCurrentTimeString());
-		}
-
 		NTSTATUS st = STATUS_SUCCESS;
-		OB_CALLBACK_REGISTRATION obReg = { 0 };
-		obReg.Version = ObGetFilterVersion();
-		obReg.OperationRegistrationCount = 1;
-		obReg.RegistrationContext = NULL;
-		RtlInitUnicodeString(&obReg.Altitude, L"321000");
-
-		OB_OPERATION_REGISTRATION opReg = { 0 };
-		opReg.ObjectType = PsProcessType;
-		opReg.Operations = OB_OPERATION_HANDLE_CREATE | OB_OPERATION_HANDLE_DUPLICATE;
-		opReg.PreOperation = &obPreCall;
-		obReg.OperationRegistration = &opReg;
-
-		KdPrint(("m_pObHandle=%x\n", m_pObHandle));
-		st = ObRegisterCallbacks(&obReg, &m_pObHandle); //在这里注册回调函数
-		if ( !NT_SUCCESS(st) )
+		KdPrint(("OnAfterCreate"));
+		//strVector = new CKeVector<DWORD,VectorNonPagePool>();
+		Map = new CKeMap<DWORD, CKeNpStringW, NonPagedObject>();
+		//Map->Insert(1, L"1111");
+		for ( int n = 0; n < 1; n++)
 		{
-			KdPrint(("ObRegisterCallbacks failed"));
+			//strVector->Add(1111);
 		}
-
-		KdPrint(("m_pObHandle=%x\n", m_pObHandle));
-
 		return st;
 	}
 
 	virtual NTSTATUS OnBeforeDelete()
 	{
-		KdPrint(("OnBeforeDelete handle=%x\n", m_pObHandle));
-		if ( m_pObHandle != NULL)
-		{
-			ObUnRegisterCallbacks(m_pObHandle);
-			m_pObHandle = NULL;
-		}
+		//delete strVector;
 		return STATUS_SUCCESS;
 	}
 
 
 private:
+	CKeVector<DWORD,VectorNonPagePool> *strVector;
+	CKeMap<DWORD, CKeNpStringW, NonPagedObject>* Map;
 	PVOID m_pObHandle;
 };
 
