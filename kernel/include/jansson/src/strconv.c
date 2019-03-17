@@ -65,9 +65,9 @@ static void from_locale(char *buffer)
 }
 #endif
 
-int jsonp_strtod(strbuffer_t *strbuffer, double *out)
+int jsonp_strtod(strbuffer_t *strbuffer, json_double *out)
 {
-    double value = 0;
+    json_double value = 0;
     char *end =0 ;
 	(end); (strbuffer);
 #if JSON_HAVE_LOCALECONV
@@ -87,7 +87,7 @@ int jsonp_strtod(strbuffer_t *strbuffer, double *out)
     return 0;
 }
 
-int jsonp_dtostr(char *buffer, size_t size, double value, int precision)
+int jsonp_dtostr(char *buffer, size_t size, json_double value, int precision)
 {
     int ret;
     char *start, *end;
@@ -96,7 +96,10 @@ int jsonp_dtostr(char *buffer, size_t size, double value, int precision)
     if (precision == 0)
         precision = 17;
 
-    ret = snprintf(buffer, size, "%.*g", precision, value);
+  //magj.  ret = snprintf(buffer, size, "%.*g", precision, value);
+	ret = snprintf(buffer, size,  
+		"%" JSON_INTEGER_FORMAT, value);
+	
     if(ret < 0)
         return -1;
 

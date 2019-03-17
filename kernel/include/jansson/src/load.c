@@ -74,7 +74,7 @@ typedef struct {
             size_t len;
         } string;
         json_int_t integer;
-        double real;
+        json_double real;
     } value;
 } lex_t;
 
@@ -495,7 +495,7 @@ static int lex_scan_number(lex_t *lex, int c, json_error_t *error)
 {
     const char *saved_text;
     char *end = 0;
-    double doubleval;
+    json_double doubleval;
 	(end);
 
     lex->token = TOKEN_INVALID;
@@ -530,7 +530,7 @@ static int lex_scan_number(lex_t *lex, int c, json_error_t *error)
         saved_text = strbuffer_value(&lex->saved_text);
 
        // errno = 0;
-
+		//strtoll()
 		//todo intval = _atoi64(saved_text,10); //json_strtoint(saved_text, &end, 10);
        /* if(errno == ERANGE) {
             if(intval < 0)

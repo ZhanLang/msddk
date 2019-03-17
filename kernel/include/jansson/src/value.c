@@ -30,11 +30,11 @@
 /* Work around nonstandard isnan() and isinf() implementations */
 #ifndef isnan
 #ifndef __sun
-static JSON_INLINE int isnan(double x) { return x != x; }
+static JSON_INLINE int isnan(json_double x) { return x != x; }
 #endif
 #endif
 #ifndef isinf
-static JSON_INLINE int isinf(double x) { return !isnan(x) && isnan(x - x); }
+static JSON_INLINE int isinf(json_double x) { return !isnan(x) && isnan(x - x); }
 #endif
 
 static JSON_INLINE void json_init(json_t *json, json_type type)
@@ -864,7 +864,7 @@ static json_t *json_integer_copy(const json_t *integer)
 
 /*** real ***/
 
-json_t *json_real(double value)
+json_t *json_real(json_double value)
 {
     json_real_t *real;
 
@@ -880,7 +880,7 @@ json_t *json_real(double value)
     return &real->json;
 }
 
-double json_real_value(const json_t *json)
+json_double json_real_value(const json_t *json)
 {
     if(!json_is_real(json))
         return 0;
@@ -888,7 +888,7 @@ double json_real_value(const json_t *json)
     return json_to_real(json)->value;
 }
 
-int json_real_set(json_t *json, double value)
+int json_real_set(json_t *json, json_double value)
 {
     if(!json_is_real(json) || isnan(value) || isinf(value))
         return -1;
@@ -916,10 +916,10 @@ static json_t *json_real_copy(const json_t *real)
 
 /*** number ***/
 
-double json_number_value(const json_t *json)
+json_double json_number_value(const json_t *json)
 {
     if(json_is_integer(json))
-        return (double)json_integer_value(json);
+        return (json_double)json_integer_value(json);
     else if(json_is_real(json))
         return json_real_value(json);
     else

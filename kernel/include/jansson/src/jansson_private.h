@@ -52,7 +52,7 @@ typedef struct {
 
 typedef struct {
     json_t json;
-    double value;
+    json_double value;
 } json_real_t;
 
 typedef struct {
@@ -79,9 +79,9 @@ void jsonp_error_vset(json_error_t *error, int line, int column,
                       size_t position, enum json_error_code code,
                       const char *msg, va_list ap);
 
-/* Locale independent string<->double conversions */
-int jsonp_strtod(strbuffer_t *strbuffer, double *out);
-int jsonp_dtostr(char *buffer, size_t size, double value, int prec);
+/* Locale independent string<->json_double conversions */
+int jsonp_strtod(strbuffer_t *strbuffer, json_double *out);
+int jsonp_dtostr(char *buffer, size_t size, json_double value, int prec);
 
 /* Wrappers for custom memory functions */
 void* jsonp_malloc(size_t size) JANSSON_ATTRS(warn_unused_result);

@@ -16,9 +16,22 @@
 #undef malloc
 #undef free
 
+void* kernel_malloc(size_t size)
+{
+	return ExAllocatePoolWithTag(PagedPool, size, 'Json');
+}
+
+void kernel_free(void * p)
+{
+	if ( p )
+	{
+		ExFreePoolWithTag(p, 'Json');
+	}
+}
+
 /* memory function pointers */
-static json_malloc_t do_malloc = 0;
-static json_free_t do_free = 0;
+static json_malloc_t do_malloc = kernel_malloc;
+static json_free_t do_free = kernel_free;
 
 void *jsonp_malloc(size_t size)
 {

@@ -55,6 +55,8 @@
 
 
 #define json_int_t long long
+#define json_double __int64
+
 #define json_strtoint _strtoi64
 #define JSON_INTEGER_FORMAT "I64d"
 

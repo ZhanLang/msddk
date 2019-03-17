@@ -229,7 +229,7 @@ static int do_dump(const json_t *json, size_t flags, int depth,
         {
             char buffer[MAX_REAL_STR_LENGTH];
             int size;
-            double value = json_real_value(json);
+            json_double value = json_real_value(json);
 
             size = jsonp_dtostr(buffer, MAX_REAL_STR_LENGTH, value,
                                 FLAGS_TO_PRECISION(flags));
