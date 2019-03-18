@@ -272,8 +272,8 @@ int json_array_insert(json_t *array, size_t ind, json_t *value)
 const char *json_string_value(const json_t *string);
 size_t json_string_length(const json_t *string);
 json_int_t json_integer_value(const json_t *integer);
-double json_real_value(const json_t *real);
-double json_number_value(const json_t *json);
+json_double json_real_value(const json_t *real);
+json_double json_number_value(const json_t *json);
 
 int json_string_set(json_t *string, const char *value);
 int json_string_setn(json_t *string, const char *value, size_t len);
@@ -351,7 +351,7 @@ int json_dumpf(const json_t *json, FILE *output, size_t flags);
 int json_dumpfd(const json_t *json, int output, size_t flags);
 int json_dump_file(const json_t *json, const char *path, size_t flags);
 int json_dump_callback(const json_t *json, json_dump_callback_t callback, void *data, size_t flags);
-
+void jsonp_free(void *ptr);
 /* custom memory allocation */
 
 typedef void *(*json_malloc_t)(size_t);

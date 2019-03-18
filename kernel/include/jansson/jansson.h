@@ -15,6 +15,9 @@
 
 #include "src/jansson_config.h"
 
+
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -63,6 +66,8 @@ typedef struct json_t {
     json_type type;
     volatile size_t refcount;
 } json_t;
+
+
 
 #ifndef JANSSON_USING_CMAKE /* disabled if using cmake */
 #if JSON_INTEGER_IS_LONG_LONG

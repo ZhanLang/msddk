@@ -85,7 +85,7 @@ int jsonp_dtostr(char *buffer, size_t size, json_double value, int prec);
 
 /* Wrappers for custom memory functions */
 void* jsonp_malloc(size_t size) JANSSON_ATTRS(warn_unused_result);
-void jsonp_free(void *ptr);
+
 char *jsonp_strndup(const char *str, size_t length) JANSSON_ATTRS(warn_unused_result);
 char *jsonp_strdup(const char *str) JANSSON_ATTRS(warn_unused_result);
 char *jsonp_strndup(const char *str, size_t len) JANSSON_ATTRS(warn_unused_result);
