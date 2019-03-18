@@ -103,4 +103,13 @@ extern"C"
 		}
 		return ERROR_INVALID_PARAMETER;
 	}
+
+	UFRAME_API HRESULT	__cdecl frame_send2(const wchar_t* drvName, int uCode, void *pInBuf, int nInCch, void * pOutBuf, int nOutCch, int* nOutSize)
+	{
+		DWORD nRetSize = 0;
+		HRESULT hRet = CDrvFile(drvName).DeviceIoControl(uCode, pInBuf, nInCch, pOutBuf, nOutCch, &nRetSize);
+		if (nOutCch)
+			*nOutSize = (INT)nRetSize;
+		return hRet;
+	}
 };

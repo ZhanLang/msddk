@@ -1,6 +1,7 @@
 #pragma once
 #include <kutil/memory.h>
 #include <kutil/string.h>
+#include <kutil/dbg.h>
 #include "lpc.h"
 
 namespace msddk { ;
@@ -10,11 +11,12 @@ class CKeLpcClient
 public:
 	CKeLpcClient(LPCWSTR lpszPortName) 
 	{
+		m_PortName = L"\\";
 		m_hSection = NULL;
 		m_hPort = NULL;
 		memset(&m_View, 0, sizeof(m_View));
 		if ( lpszPortName )
-			m_PortName = lpszPortName;
+			m_PortName += lpszPortName;
 	};
 
 	~CKeLpcClient()
@@ -137,7 +139,7 @@ private:
 		return st;
 	}
 private:
-	CKeStringW m_PortName;
+	CKePageStringW m_PortName;
 	HANDLE m_hSection;
 	HANDLE m_hPort;
 	PORT_VIEW m_View;
