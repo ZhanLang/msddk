@@ -531,7 +531,7 @@ static int lex_scan_number(lex_t *lex, int c, json_error_t *error)
 
        // errno = 0;
 		//strtoll()
-		//todo intval = _atoi64(saved_text,10); //json_strtoint(saved_text, &end, 10);
+		 intval = json_strtoint(saved_text, &end, 10);
        /* if(errno == ERANGE) {
             if(intval < 0)
                 error_set(error, lex, json_error_numeric_overflow, "too big negative integer");

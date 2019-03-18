@@ -75,7 +75,8 @@ int jsonp_strtod(strbuffer_t *strbuffer, json_double *out)
 #endif
 
    //magj. errno = 0;
-    //todo. value = strtod(strbuffer->value, &end);
+	value = json_strtoint(strbuffer->value, &end, 10);
+    //value = strtod(strbuffer->value, &end);
    // assert(end == strbuffer->value + strbuffer->length);
 
   //  if((value == HUGE_VAL || value == -HUGE_VAL) && errno == ERANGE) {
