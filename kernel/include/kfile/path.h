@@ -18,6 +18,12 @@ public:
 		PFILE_OBJECT FileObject = NULL;
 		POBJECT_NAME_INFORMATION lpName = NULL;
 
+		ASSERT(KeGetCurrentIrql() == PASSIVE_LEVEL);
+		if (KeGetCurrentIrql() != PASSIVE_LEVEL)
+			return STATUS_ACCESS_DENIED;
+		
+		
+
 		RtlInitUnicodeString(&uNtFileName, NtFileName);
 		InitializeObjectAttributes(&ObjectAttributes, &uNtFileName, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
 

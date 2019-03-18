@@ -22,7 +22,7 @@ struct VectorNonPagePool : public NonPagedObject{
 	}
 };
 
-template<class T,class M=VectorPagePool>
+template<class T,class M= VectorNonPagePool>
 class CKeVectorBaseImp : public M
 {
 public:
@@ -55,7 +55,7 @@ private:
 };
 
 
-template<typename T, class M = VectorPagePool>
+template<typename T, class M = VectorNonPagePool>
 class  CKeVectorBase: public CKeVectorBaseImp<T,M>
 {
 public:
@@ -79,7 +79,7 @@ public:
 	void Sort(int (*compare)(const T*, const T*, void *), void *param);
 };
 
-template <class T, class M = VectorPagePool>
+template <class T, class M = VectorNonPagePool>
 class CKeVector: public CKeVectorBase<void*,M>
 {
 public:

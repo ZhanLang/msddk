@@ -11,6 +11,7 @@ namespace msddk { ;
 
 static inline void *bulk_malloc(size_t size)
 {
+	ASSERT(KeGetCurrentIrql() == PASSIVE_LEVEL);
 	return ExAllocatePool(PagedPool, size);
 }
 
@@ -33,12 +34,14 @@ static inline void* npagednew(size_t size)
 
 static inline  void * _cdecl malloc(size_t size)
 {
+	ASSERT(KeGetCurrentIrql() == PASSIVE_LEVEL);
 	return ExAllocatePoolWithTag(PagedPool, size, 'LACB');
 }
 static inline  void * _cdecl npagemalloc(size_t size)
 {
-	return ExAllocatePoolWithTag(PagedPool, size, 'LANB');
+	return ExAllocatePoolWithTag(NonPagedPool, size, 'LANB');
 }
+
 
 static inline void _cdecl free(void *p)
 {

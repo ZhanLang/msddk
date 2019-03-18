@@ -162,11 +162,11 @@ bool operator!=(const T *s1, const CKeStringBase<T,NTStr,M>& s2);
 template<typename T,typename NTStr,typename M>
 bool operator!=(const CKeStringBase<T,NTStr,M>& s1, const T *s2);
 
-typedef CKeStringBase<char, ANSI_STRING , StrPageMem>   CKeStringA;
-typedef CKeStringBase<wchar_t, UNICODE_STRING, StrPageMem>CKeStringW;
+typedef CKeStringBase<char, ANSI_STRING , StrNonPageMem>   CKeStringA;
+typedef CKeStringBase<wchar_t, UNICODE_STRING, StrNonPageMem>CKeStringW;
 
-typedef CKeStringBase<char, ANSI_STRING, StrNonPageMem>   CKeNpStringA;
-typedef CKeStringBase<wchar_t, UNICODE_STRING, StrNonPageMem>CKeNpStringW;
+typedef CKeStringBase<char, ANSI_STRING, StrPageMem>   CKePageStringA;
+typedef CKeStringBase<wchar_t, UNICODE_STRING, StrPageMem>CKePageStringW;
 
 
 /*-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_*/
