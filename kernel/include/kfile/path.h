@@ -9,7 +9,7 @@ public:
 	// \Device\HarddiskVolume1\Windows\explorer.exe
 	// To
 	// C:\Windows\explorer.exe
-	static NTSTATUS NtFileNameToDosFileName(LPCWSTR _NtFileName, CKeStringW& DosFileName)
+	static NTSTATUS NtFileNameToDosFileName(LPCWSTR _NtFileName, CKePageStringW& DosFileName)
 	{
 		NTSTATUS status = STATUS_SUCCESS;
 		HANDLE hFile = NULL;
@@ -17,7 +17,7 @@ public:
 		IO_STATUS_BLOCK IoStatusBlock;
 		PFILE_OBJECT FileObject = NULL;
 		POBJECT_NAME_INFORMATION lpName = NULL;
-		CKeStringW NtFileName = _NtFileName;
+		CKePageStringW NtFileName = _NtFileName;
 
 
 		do 

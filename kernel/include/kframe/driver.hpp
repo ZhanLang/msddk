@@ -12,7 +12,7 @@ CDriver::CDriver(bool RegisterAddDevice /*= false*/)
 	
 NTSTATUS CDriver::DispatchRoutine(IN PDEVICE_OBJECT  DeviceObject, IN PIRP  Irp, bool bIsPowerIrp)
 {
-	KdPrint(("DispatchRoutine"));
+	//KdPrint(("DispatchRoutine"));
 	if (!DeviceObject || !Irp)
 		return STATUS_ACCESS_VIOLATION;
 	CDevice::Extension *pExt = (CDevice::Extension *)DeviceObject->DeviceExtension;

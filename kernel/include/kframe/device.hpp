@@ -185,7 +185,7 @@ NTSTATUS CDevice::ProcessIRP(IN PIRP  Irp, bool bIsPowerIrp)
 	UNREFERENCED_PARAMETER(Irp);
 	UNREFERENCED_PARAMETER(bIsPowerIrp);
 
-	KdPrint(("ProcessIRP\n"));
+	//KdPrint(("ProcessIRP\n"));
 	if (!m_pDeviceObject)
 		return STATUS_INVALID_DEVICE_STATE;
 

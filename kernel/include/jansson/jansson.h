@@ -7,7 +7,7 @@
 
 #ifndef JANSSON_H
 #define JANSSON_H
-
+#pragma warning(disable:4706)
 #include <stdio.h>
 #include <stdlib.h>  /* for size_t */
 #include <stdarg.h>
