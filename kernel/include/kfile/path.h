@@ -1,5 +1,6 @@
 #pragma once
 #include <kutil/string.h>
+#include "../kutil/dbg.h"
 namespace msddk { ;
 
 class CKePath
@@ -8,56 +9,154 @@ public:
 	// \Device\HarddiskVolume1\Windows\explorer.exe
 	// To
 	// C:\Windows\explorer.exe
-	static NTSTATUS NtFileNameToDosFileName(LPCWSTR NtFileName, CKeStringW& DosFileName)
+	static NTSTATUS NtFileNameToDosFileName(LPCWSTR _NtFileName, CKeStringW& DosFileName)
 	{
 		NTSTATUS status = STATUS_SUCCESS;
-		OBJECT_ATTRIBUTES ObjectAttributes;
-		UNICODE_STRING uNtFileName;
 		HANDLE hFile = NULL;
+		OBJECT_ATTRIBUTES ObjectAttributes;
 		IO_STATUS_BLOCK IoStatusBlock;
 		PFILE_OBJECT FileObject = NULL;
 		POBJECT_NAME_INFORMATION lpName = NULL;
+		CKeStringW NtFileName = _NtFileName;
 
-		ASSERT(KeGetCurrentIrql() == PASSIVE_LEVEL);
-		if (KeGetCurrentIrql() != PASSIVE_LEVEL)
-			return STATUS_ACCESS_DENIED;
+
+		do 
+		{
+			InitializeObjectAttributes(&ObjectAttributes, NtFileName, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
+			status = ZwOpenFile(&hFile, FILE_READ_ATTRIBUTES | SYNCHRONIZE, &ObjectAttributes, &IoStatusBlock, FILE_SHARE_READ, FILE_SYNCHRONOUS_IO_NONALERT);
+			if (!NT_SUCCESS(status))
+			{
+				ASSERT(FALSE);
+				break;
+			}
+			status = ObReferenceObjectByHandle(hFile, FILE_READ_ATTRIBUTES, *IoFileObjectType, KernelMode, (PVOID*)&FileObject, NULL);
+			if (!NT_SUCCESS(status))
+			{
+				ASSERT(FALSE);
+				break;
+			}
+			status = IoQueryFileDosDeviceName(FileObject, &lpName);
+			if (!NT_SUCCESS(status))
+			{
+				ASSERT(FALSE);
+				break;
+			}
+
+			DosFileName = &lpName->Name;
+		} while (FALSE);
 		
-		
 
-		RtlInitUnicodeString(&uNtFileName, NtFileName);
-		InitializeObjectAttributes(&ObjectAttributes, &uNtFileName, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
+		if (lpName)
+			ExFreePool(lpName);
 
-		status = ZwOpenFile(&hFile, FILE_READ_ATTRIBUTES | SYNCHRONIZE, &ObjectAttributes, &IoStatusBlock, FILE_SHARE_READ, FILE_SYNCHRONOUS_IO_NONALERT);
-		if (!NT_SUCCESS(status))
-		{
-			return status;
-		}
-
-		status = ObReferenceObjectByHandle(hFile, FILE_READ_ATTRIBUTES, *IoFileObjectType, KernelMode, (PVOID*)&FileObject, NULL);
-		if (!NT_SUCCESS(status))
-		{
-			ZwClose(hFile);
-			return status;
-		}
-
-		status = IoQueryFileDosDeviceName(FileObject, &lpName);
-		if (!NT_SUCCESS(status))
-		{
+		if (FileObject)
 			ObDereferenceObject(FileObject);
+
+		if (hFile)
 			ZwClose(hFile);
-			return status;
-		}
-
-
-		DosFileName = &lpName->Name;
-		ObDereferenceObject(FileObject);
-		ZwClose(hFile);
 		return status;
 	}
 
-	// \??\C:\Windows\Windows\explorer.exe
+	// C:\Windows\explorer.exe
 	// To
-	// C:\Windows\Windows\explorer.exe
+	// \Device\HarddiskVolume1\Windows\explorer.exe
+	static NTSTATUS DosFileNameToNtFileName(LPCWSTR _DosFileName, CKePageStringW& NtFileName)
+	{
+		NTSTATUS status = STATUS_UNSUCCESSFUL;
+		HANDLE hFile;
+		OBJECT_ATTRIBUTES ObjectAttributes;
+		IO_STATUS_BLOCK IoStatusBlock;
+		PFILE_OBJECT FileObject = NULL;
+		UNICODE_STRING volumeDosName;
+		CKePageStringW DosFileName = L"\\??\\";
+		DosFileName+=_DosFileName;
+
+		do 
+		{
+			InitializeObjectAttributes(&ObjectAttributes, (PUNICODE_STRING)DosFileName, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
+			status = ZwOpenFile(&hFile, FILE_READ_ATTRIBUTES | SYNCHRONIZE, &ObjectAttributes, &IoStatusBlock, FILE_SHARE_READ, FILE_SYNCHRONOUS_IO_NONALERT);
+			if (!NT_SUCCESS(status))
+			{
+				KdPrint(("DosFileNameToNtFileName::ZwOpenFile %ws\n", MapNTStatus(status)));
+				break;
+			}
+
+			status = ObReferenceObjectByHandle(hFile, FILE_READ_ATTRIBUTES, *IoFileObjectType, KernelMode, (PVOID*)&FileObject, NULL);
+			if (!NT_SUCCESS(status))
+			{
+				KdPrint(("DosFileNameToNtFileName::ObReferenceObjectByHandle %ws\n", MapNTStatus(status)));
+				ASSERT(FALSE);
+				ZwClose(hFile);
+				hFile = NULL;
+				break;
+			}
+			ZwClose(hFile);
+			hFile = NULL;
+
+			status = IoVolumeDeviceToDosName(FileObject->DeviceObject, &volumeDosName);
+			if (!NT_SUCCESS(status))
+			{
+				KdPrint(("DosFileNameToNtFileName::IoVolumeDeviceToDosName %ws\n", MapNTStatus(status)));
+				ASSERT(FALSE);
+				break;
+			}
+			CKePageStringW VolumeDosName = L"\\??\\";
+			VolumeDosName += &volumeDosName;
+			ExFreePool(volumeDosName.Buffer);
+			
+			CKePageStringW LinkTarget;
+			status = FileMonQuerySymbolicLink(VolumeDosName, LinkTarget);
+			if ( !NT_SUCCESS(status) )
+			{
+				ASSERT(FALSE);
+				KdPrint(("DosFileNameToNtFileName::FileMonQuerySymbolicLink %ws\n", MapNTStatus(status)));
+				break;
+			}
+			
+			LinkTarget += &FileObject->FileName;
+			NtFileName = LinkTarget;
+		} while (FALSE);
+		
+	
+		if (FileObject)
+			ObDereferenceObject(FileObject);
+
+		return status;
+	}
+
+	static NTSTATUS  FileMonQuerySymbolicLink(LPCWSTR _SymbolicLinkName, CKePageStringW& LinkTarget)
+	{
+		OBJECT_ATTRIBUTES ObjectAttributes;
+		HANDLE LinkHandle = NULL;
+		NTSTATUS status = STATUS_UNSUCCESSFUL;
+		CKePageStringW SymbolicLinkName = _SymbolicLinkName;
+
+		do 
+		{
+			InitializeObjectAttributes(&ObjectAttributes, SymbolicLinkName, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, 0, 0);
+			status  = ZwOpenSymbolicLinkObject(&LinkHandle, GENERIC_READ, &ObjectAttributes);
+			if (!NT_SUCCESS(status))
+			{
+				KdPrint(("FileMonQuerySymbolicLink.ZwOpenSymbolicLinkObject %ws\n", MapNTStatus(status)));
+				ASSERT(FALSE);
+				break;
+			}
+
+			LinkTarget.GetBufferSetLength(MAX_PATH);
+			status = ZwQuerySymbolicLinkObject(LinkHandle, LinkTarget, NULL);
+			LinkTarget.ReleaseBuffer();
+
+			if (!NT_SUCCESS(status))
+			{
+				KdPrint(("FileMonQuerySymbolicLink.ZwQuerySymbolicLinkObject %ws\n", MapNTStatus(status)));
+				ASSERT(FALSE);
+			}
+		} while (FALSE);
+		
+		return status;
+	}
+	
+
 	static VOID RemoveLinkTarge(CKeStringW& FileName);
 };
 

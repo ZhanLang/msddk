@@ -7,7 +7,11 @@ namespace msddk{;
 
 struct StrPageMem : public PagedObject{
 	VOID* Malloc(size_t size){
-		return ExAllocatePoolWithTag(PagedPool, size, 'SPag');
+		VOID* p = ExAllocatePoolWithTag(PagedPool, size, 'SPag');
+		if ( p )
+			memset(p, 0, size);
+		
+		return p;
 	}
 	VOID Free(VOID* lpVoid){
 		if (lpVoid)
@@ -17,7 +21,10 @@ struct StrPageMem : public PagedObject{
 
 struct StrNonPageMem : public NonPagedObject{
 	VOID* Malloc(size_t size){
-		return ExAllocatePoolWithTag(NonPagedPool, size, 'SNPa');
+		VOID* p = ExAllocatePoolWithTag(NonPagedPool, size, 'SNPa');
+		if (p)
+			memset(p, 0, size);
+		return p;
 	}
 	VOID Free(VOID* lpVoid){
 		if (lpVoid)
@@ -35,7 +42,7 @@ public:
 	CKeStringBase(T c);
 	CKeStringBase(const T *chars);
 	CKeStringBase(const CKeStringBase &s);
-
+	CKeStringBase(const PNTStr &s);
 	~CKeStringBase();
 	operator const T*() const ;
 	T Back() const ;
@@ -52,6 +59,7 @@ public:
 	CKeStringBase& operator+=(T c);
 	CKeStringBase& operator+=(const T *s);
 	CKeStringBase& operator+=(const CKeStringBase &s);
+	CKeStringBase& operator+=(const PNTStr &s);
 	operator const PNTStr();
 	CKeStringBase Mid(int startIndex) const;
 	CKeStringBase Mid(int startIndex, int count) const;
@@ -107,6 +115,7 @@ private:
 	inline void CorrectIndex(int &index) const;
 	CKeStringBase GetTrimDefaultCharSet();
 	inline T * StringCopy(T *dest, const T *src);
+	inline T * StringNCopy(T *dest, const T *src,int n);
 	inline int StringLen(const T *s);
 	inline const T* GetNextCharPointer(const T *p)const;
 	inline const T* GetPrevCharPointer(const T *, const T *p)const;
@@ -124,6 +133,8 @@ private:
 	int _capacity;
 	NTStr _ntStr;
 };
+
+
 
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M> operator+(const CKeStringBase<T,NTStr,M>& s1, const CKeStringBase<T,NTStr,M>& s2);
@@ -210,6 +221,19 @@ CKeStringBase<T,NTStr,M>::CKeStringBase(const CKeStringBase &s):  _chars(0), _le
 	_length = s._length;
 }
 
+template<typename T, typename NTStr, typename M /*= StrPageMem*/>
+msddk::CKeStringBase<T, NTStr, M>::CKeStringBase(const PNTStr &ntStr)
+{
+	memset(&_ntStr, 0, sizeof(_ntStr));
+	if (ntStr && ntStr->Buffer && ntStr->Length)
+	{
+		_length = ntStr->Length / sizeof(T);
+		SetCapacity(_length);
+		StringNCopy(_chars, ntStr->Buffer, _length);
+	}
+	
+}
+
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>::~CKeStringBase() 
 {  
@@ -287,17 +311,14 @@ CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator=(const T *chars)
 template<typename T, typename NTStr, typename M>
 CKeStringBase<T, NTStr,M>& CKeStringBase<T, NTStr,M>::operator=(const PNTStr ntStr)
 {
-	if (ntStr && ntStr->Length && ntStr->Buffer)
+	Empty();
+	if (ntStr && ntStr->Buffer && ntStr->Length)
 	{
-		USHORT uStrlen = ntStr->Length / sizeof(T);
-		T* pBuf = GetBufferSetLength(uStrlen + 1);
-		for (USHORT uLoop = 0; uLoop < uStrlen; uLoop++)
-			pBuf[uLoop] = ntStr->Buffer[uLoop];
-		
-		pBuf[uStrlen] = '\0';
-		ReleaseBuffer();
+		_length = ntStr->Length / sizeof(T);
+		SetCapacity(_length);
+		StringNCopy(_chars, ntStr->Buffer, _length);
 	}
-	
+
 	return *this;
 }
 
@@ -340,17 +361,9 @@ CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator+=(const T *s)
 template<typename T, typename NTStr, typename M>
 CKeStringBase<T, NTStr,M>::operator const PNTStr()
 {
-	if (IsEmpty() )
-	{
-		memset(&_ntStr, 0, sizeof(_ntStr));
-	}
-	else
-	{
-		_ntStr.Length = (USHORT)(Length() * sizeof(T));
-		_ntStr.MaximumLength = _ntStr.Length + sizeof(wchar_t);
-		_ntStr.Buffer = _chars;
-	}
-	
+	_ntStr.Length = (USHORT)(_length * sizeof(T));
+	_ntStr.MaximumLength = (USHORT)(_capacity * sizeof(T));
+	_ntStr.Buffer = _chars;
 	return &_ntStr;
 }
 
@@ -366,6 +379,20 @@ CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator+=(const CKeStringBa
 	
 	return *this;
 }
+
+template<typename T, typename NTStr, typename M /*= StrPageMem*/>
+CKeStringBase<T, NTStr, M>& msddk::CKeStringBase<T, NTStr, M>::operator+=(const PNTStr &ntStr)
+{
+	if (ntStr && ntStr->Buffer && ntStr->Length)
+	{
+		int length = ntStr->Length / sizeof(T);
+		GrowLength(length);
+		StringNCopy(_chars + _length, ntStr->Buffer, length);
+		_length += length;
+	}
+	return *this;
+}
+
 
 
 template<typename T,typename NTStr,typename M>
@@ -828,6 +855,21 @@ inline T * CKeStringBase<T,NTStr,M>::StringCopy(T *dest, const T *src)
 	
 	return NULL;
 }
+
+template<typename T, typename NTStr, typename M>
+inline T * CKeStringBase<T, NTStr, M>::StringNCopy(T *dest, const T *src, int n)
+{
+	if (dest && src && n)
+	{
+		T *destStart = dest;
+		for ( int i=0 ;i < n ; i++)
+			dest[i] = src[i];
+		return destStart;
+	}
+
+	return NULL;
+}
+
 
 template<typename T,typename NTStr,typename M>
 inline int CKeStringBase<T,NTStr,M>::StringLen(const T *s)
