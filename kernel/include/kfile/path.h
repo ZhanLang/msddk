@@ -1,6 +1,6 @@
 #pragma once
 #include <kutil/string.h>
-#include "../kutil/dbg.h"
+#include <kutil/dbg.h>
 namespace msddk { ;
 
 class CKePath
@@ -63,7 +63,7 @@ public:
 	static NTSTATUS DosFileNameToNtFileName(LPCWSTR _DosFileName, CKePageStringW& NtFileName)
 	{
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
-		HANDLE hFile;
+		HANDLE hFile = NULL;
 		OBJECT_ATTRIBUTES ObjectAttributes;
 		IO_STATUS_BLOCK IoStatusBlock;
 		PFILE_OBJECT FileObject = NULL;
@@ -153,6 +153,11 @@ public:
 			}
 		} while (FALSE);
 		
+		if ( LinkHandle )
+		{
+			ZwClose(LinkHandle);
+		}
+
 		return status;
 	}
 	

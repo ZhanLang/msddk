@@ -82,9 +82,11 @@ public:
 		if (!NT_SUCCESS(Status))
 			return Status;
 
+		/*
 		Status = ObOpenObjectByPointer(pEprocess, OBJ_KERNEL_HANDLE, NULL, GENERIC_READ, *PsProcessType, KernelMode, &hProcess);
 		if (!NT_SUCCESS(Status))
 			return Status;
+		*/
 
 		return GetProcessImagePath(pEprocess, ImagePath);
 	}
