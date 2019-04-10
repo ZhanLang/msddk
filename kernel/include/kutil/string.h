@@ -8,8 +8,8 @@ namespace msddk{;
 struct StrPageMem : public PagedObject{
 	VOID* Malloc(size_t size){
 		VOID* p = ExAllocatePoolWithTag(PagedPool, size, 'SPag');
-// 		if ( p )
-// 			memset(p, 0, size);
+ 		if ( p )
+ 			memset(p, 0, size);
 		
 		return p;
 	}
@@ -22,8 +22,8 @@ struct StrPageMem : public PagedObject{
 struct StrNonPageMem : public NonPagedObject{
 	VOID* Malloc(size_t size){
 		VOID* p = ExAllocatePoolWithTag(NonPagedPool, size, 'SNPa');
-// 		if (p)
-// 			memset(p, 0, size);
+ 		if (p)
+ 			memset(p, 0, size);
 		return p;
 	}
 	VOID Free(VOID* lpVoid){
@@ -264,7 +264,10 @@ template<typename T,typename NTStr,typename M>
 T* CKeStringBase<T,NTStr,M>::GetBufferSetLength(int minBufLenght)
 {
 	if (minBufLenght >= _capacity)
+	{
 		SetCapacity(minBufLenght);
+	}
+		
 
 	return _chars;
 }
