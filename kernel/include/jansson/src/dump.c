@@ -177,7 +177,7 @@ static int dump_string(const char *str, size_t len, json_dump_callback_t dump, v
     return dump("\"", 1, data);
 }
 
-static int compare_keys(const void *key1, const void *key2)
+int _cdecl compare_keys(const void *key1, const void *key2)
 {
     return strcmp(*(const char **)key1, *(const char **)key2);
 }
