@@ -8,8 +8,8 @@ namespace msddk{;
 struct StrPageMem : public PagedObject{
 	VOID* Malloc(size_t size){
 		VOID* p = ExAllocatePoolWithTag(PagedPool, size, 'SPag');
-		if ( p )
-			memset(p, 0, size);
+// 		if ( p )
+// 			memset(p, 0, size);
 		
 		return p;
 	}
@@ -22,8 +22,8 @@ struct StrPageMem : public PagedObject{
 struct StrNonPageMem : public NonPagedObject{
 	VOID* Malloc(size_t size){
 		VOID* p = ExAllocatePoolWithTag(NonPagedPool, size, 'SNPa');
-		if (p)
-			memset(p, 0, size);
+// 		if (p)
+// 			memset(p, 0, size);
 		return p;
 	}
 	VOID Free(VOID* lpVoid){
@@ -864,6 +864,8 @@ inline T * CKeStringBase<T, NTStr, M>::StringNCopy(T *dest, const T *src, int n)
 		T *destStart = dest;
 		for ( int i=0 ;i < n ; i++)
 			dest[i] = src[i];
+
+		destStart[n] = '\0';
 		return destStart;
 	}
 
@@ -897,20 +899,18 @@ template<typename T,typename NTStr,typename M>
 inline void CKeStringBase<T, NTStr,M>::SetCapacity(int newCapacity)
 {
 	int realCapacity = newCapacity + 1;
-	if (realCapacity == _capacity)
+	if (realCapacity <= _capacity)
 		return;
 
 	T *newBuffer = (T*)Malloc(realCapacity*sizeof(T));
+	for (int i = 0; i < _length; i++)
+		newBuffer[i] = _chars[i];
+		
+	newBuffer[_length] = '\0';
 	
-	if (_capacity > 0)
-	{
-		for (int i = 0; i < _length; i++)
-			newBuffer[i] = _chars[i];
-		Free(_chars);
-	}
 
+	Free(_chars);
 	_chars = newBuffer;
-	_chars[_length] = 0;
 	_capacity = realCapacity;
 }
 
