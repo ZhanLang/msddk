@@ -227,11 +227,11 @@ msddk::CKeStringBase<T, NTStr, M>::CKeStringBase(const PNTStr &ntStr)
 	memset(&_ntStr, 0, sizeof(_ntStr));
 	if (ntStr && ntStr->Buffer && ntStr->Length)
 	{
-		_length = ntStr->Length / sizeof(T);
-		SetCapacity(_length);
-		StringNCopy(_chars, ntStr->Buffer, _length);
+		int length = ntStr->Length / sizeof(T);
+		SetCapacity(length);
+		StringNCopy(_chars, ntStr->Buffer, length);
+		_length = length;
 	}
-	
 }
 
 template<typename T,typename NTStr,typename M>
@@ -317,9 +317,10 @@ CKeStringBase<T, NTStr,M>& CKeStringBase<T, NTStr,M>::operator=(const PNTStr ntS
 	Empty();
 	if (ntStr && ntStr->Buffer && ntStr->Length)
 	{
-		_length = ntStr->Length / sizeof(T);
-		SetCapacity(_length);
-		StringNCopy(_chars, ntStr->Buffer, _length);
+		int length = ntStr->Length / sizeof(T);
+		SetCapacity(length);
+		StringNCopy(_chars, ntStr->Buffer, length);
+		_length = length;
 	}
 
 	return *this;
