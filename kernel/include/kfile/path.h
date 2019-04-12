@@ -70,6 +70,8 @@ public:
 	static NTSTATUS DosFileNameToNtFileName(LPCWSTR _DosFileName, CKePageStringW& NtFileName)
 	{
 		PAGED_CODE();
+		
+
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
 		HANDLE hFile = NULL;
 		OBJECT_ATTRIBUTES ObjectAttributes;
@@ -78,6 +80,12 @@ public:
 		UNICODE_STRING volumeDosName;
 		CKePageStringW DosFileName = L"\\??\\";
 		DosFileName+=_DosFileName;
+		if (DosFileName.Compare(L"System") == 0 ||
+			DosFileName.Compare(L"Registry") == 0)
+		{
+			NtFileName = DosFileName;
+			return status;
+		}
 
 		do 
 		{
