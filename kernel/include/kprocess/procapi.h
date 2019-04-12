@@ -16,8 +16,9 @@ namespace msddk {;
 
 class CKeProcess {
 public:
-	static NTSTATUS GetProcessImagePath(PEPROCESS pEprocess, CKeStringW& ImagePath)
+	static NTSTATUS GetProcessImagePath(PEPROCESS pEprocess, CKePageStringW& ImagePath)
 	{
+		PAGED_CODE();
 		HANDLE hProcess = NULL;
 		NTSTATUS Status = STATUS_SUCCESS;
 		ULONG returnedLength;
@@ -26,7 +27,6 @@ public:
 		PUNICODE_STRING imageName;
 
 		static QUERY_INFO_PROCESS ZwQueryInformationProcess = NULL;
-		PAGED_CODE();
 
 		if (NULL == ZwQueryInformationProcess)
 		{
@@ -41,7 +41,11 @@ public:
 
 		Status = ObOpenObjectByPointer(pEprocess, OBJ_KERNEL_HANDLE, NULL, GENERIC_READ, *PsProcessType, KernelMode, &hProcess);
 		if (!NT_SUCCESS(Status))
+		{
+			KdPrint(("Function GetProcessImagePath call ObOpenObjectByPointer(%p) failed. Status is %ws\n", pEprocess, MapNTStatus(Status)));
 			return Status;
+		}
+			
 
 		Status = ZwQueryInformationProcess(hProcess, ProcessImageFileName, NULL, 0, &returnedLength);
 
@@ -72,26 +76,23 @@ public:
 		return Status;
 	}
 
-	static NTSTATUS GetProcessImagePath(IN HANDLE dwProcessId, CKeStringW& ImagePath)
+	static NTSTATUS GetProcessImagePath(IN HANDLE dwProcessId, CKePageStringW& ImagePath)
 	{
 		NTSTATUS Status;
-		HANDLE hProcess;
-		PEPROCESS pEprocess;
+		PEPROCESS pEprocess = NULL;
 		PAGED_CODE();
 		Status = PsLookupProcessByProcessId((HANDLE)dwProcessId, &pEprocess);
 		if (!NT_SUCCESS(Status))
+		{
+			KdPrint(("Function GetProcessImagePath2 call PsLookupProcessByProcessId(%p) failed. Status is %ws\n", dwProcessId, MapNTStatus(Status)));
 			return Status;
-
-		/*
-		Status = ObOpenObjectByPointer(pEprocess, OBJ_KERNEL_HANDLE, NULL, GENERIC_READ, *PsProcessType, KernelMode, &hProcess);
-		if (!NT_SUCCESS(Status))
-			return Status;
-		*/
+		}
+			
 
 		return GetProcessImagePath(pEprocess, ImagePath);
 	}
 
-	static NTSTATUS GetProcessDosFileName(HANDLE dwProcessId, CKeStringW& ImagePath)
+	static NTSTATUS GetProcessDosFileName(HANDLE dwProcessId, CKePageStringW& ImagePath)
 	{
 		NTSTATUS status = GetProcessImagePath(dwProcessId, ImagePath);
 		if ( NT_SUCCESS(status ))
@@ -101,7 +102,7 @@ public:
 		return status;
 	}
 
-	static NTSTATUS GetProcessDosFileName(PEPROCESS pEprocess, CKeStringW& ImagePath)
+	static NTSTATUS GetProcessDosFileName(PEPROCESS pEprocess, CKePageStringW& ImagePath)
 	{
 		NTSTATUS status = GetProcessImagePath(pEprocess, ImagePath);
 		if (NT_SUCCESS(status))

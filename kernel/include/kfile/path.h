@@ -11,6 +11,7 @@ public:
 	// C:\Windows\explorer.exe
 	static NTSTATUS NtFileNameToDosFileName(LPCWSTR _NtFileName, CKePageStringW& DosFileName)
 	{
+		PAGED_CODE();
 		NTSTATUS status = STATUS_SUCCESS;
 		HANDLE hFile = NULL;
 		OBJECT_ATTRIBUTES ObjectAttributes;
@@ -26,19 +27,19 @@ public:
 			status = ZwOpenFile(&hFile, FILE_READ_ATTRIBUTES | SYNCHRONIZE, &ObjectAttributes, &IoStatusBlock, FILE_SHARE_READ, FILE_SYNCHRONOUS_IO_NONALERT);
 			if (!NT_SUCCESS(status))
 			{
-				ASSERT(FALSE);
+				KdPrint(("Function NtFileNameToDosFileName call ZwOpenFile(%ws) failed. Status is %ws\n", NtFileName.GetBuffer(), MapNTStatus(status)));
 				break;
 			}
 			status = ObReferenceObjectByHandle(hFile, FILE_READ_ATTRIBUTES, *IoFileObjectType, KernelMode, (PVOID*)&FileObject, NULL);
 			if (!NT_SUCCESS(status))
 			{
-				ASSERT(FALSE);
+				KdPrint(("Function NtFileNameToDosFileName call ObReferenceObjectByHandle(%ws) failed. Status is %ws\n", NtFileName.GetBuffer(), MapNTStatus(status)));
 				break;
 			}
 			status = IoQueryFileDosDeviceName(FileObject, &lpName);
 			if (!NT_SUCCESS(status))
 			{
-				ASSERT(FALSE);
+				KdPrint(("Function NtFileNameToDosFileName call IoQueryFileDosDeviceName(%ws) failed. Status is %ws\n", NtFileName.GetBuffer(), MapNTStatus(status)));
 				break;
 			}
 
@@ -62,6 +63,7 @@ public:
 	// \Device\HarddiskVolume1\Windows\explorer.exe
 	static NTSTATUS DosFileNameToNtFileName(LPCWSTR _DosFileName, CKePageStringW& NtFileName)
 	{
+		PAGED_CODE();
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
 		HANDLE hFile = NULL;
 		OBJECT_ATTRIBUTES ObjectAttributes;
@@ -77,15 +79,15 @@ public:
 			status = ZwOpenFile(&hFile, FILE_READ_ATTRIBUTES | SYNCHRONIZE, &ObjectAttributes, &IoStatusBlock, FILE_SHARE_READ, FILE_SYNCHRONOUS_IO_NONALERT);
 			if (!NT_SUCCESS(status))
 			{
-				KdPrint(("DosFileNameToNtFileName::ZwOpenFile %ws\n", MapNTStatus(status)));
+				KdPrint(("Function DosFileNameToNtFileName call ZwOpenFile(%ws) failed. Status is %ws\n", _DosFileName, MapNTStatus(status)));
 				break;
 			}
 
 			status = ObReferenceObjectByHandle(hFile, FILE_READ_ATTRIBUTES, *IoFileObjectType, KernelMode, (PVOID*)&FileObject, NULL);
 			if (!NT_SUCCESS(status))
 			{
-				KdPrint(("DosFileNameToNtFileName::ObReferenceObjectByHandle %ws\n", MapNTStatus(status)));
-				ASSERT(FALSE);
+				KdPrint(("Function DosFileNameToNtFileName call ObReferenceObjectByHandle(%ws) failed. Status is %ws\n", _DosFileName, MapNTStatus(status)));
+				
 				ZwClose(hFile);
 				hFile = NULL;
 				break;
@@ -96,8 +98,7 @@ public:
 			status = IoVolumeDeviceToDosName(FileObject->DeviceObject, &volumeDosName);
 			if (!NT_SUCCESS(status))
 			{
-				KdPrint(("DosFileNameToNtFileName::IoVolumeDeviceToDosName %ws\n", MapNTStatus(status)));
-				ASSERT(FALSE);
+				KdPrint(("Function DosFileNameToNtFileName call IoVolumeDeviceToDosName(%ws) failed. Status is %ws\n", _DosFileName, MapNTStatus(status)));
 				break;
 			}
 			CKePageStringW VolumeDosName = L"\\??\\";
@@ -108,8 +109,7 @@ public:
 			status = FileMonQuerySymbolicLink(VolumeDosName, LinkTarget);
 			if ( !NT_SUCCESS(status) )
 			{
-				ASSERT(FALSE);
-				KdPrint(("DosFileNameToNtFileName::FileMonQuerySymbolicLink %ws\n", MapNTStatus(status)));
+				KdPrint(("Function DosFileNameToNtFileName call FileMonQuerySymbolicLink(%ws) failed. Status is %ws\n", _DosFileName, MapNTStatus(status)));
 				break;
 			}
 			
@@ -126,6 +126,7 @@ public:
 
 	static NTSTATUS  FileMonQuerySymbolicLink(LPCWSTR _SymbolicLinkName, CKePageStringW& LinkTarget)
 	{
+		PAGED_CODE();
 		OBJECT_ATTRIBUTES ObjectAttributes;
 		HANDLE LinkHandle = NULL;
 		NTSTATUS status = STATUS_UNSUCCESSFUL;
@@ -137,8 +138,7 @@ public:
 			status  = ZwOpenSymbolicLinkObject(&LinkHandle, GENERIC_READ, &ObjectAttributes);
 			if (!NT_SUCCESS(status))
 			{
-				KdPrint(("FileMonQuerySymbolicLink.ZwOpenSymbolicLinkObject %ws\n", MapNTStatus(status)));
-				ASSERT(FALSE);
+				KdPrint(("Function FileMonQuerySymbolicLink call ZwOpenSymbolicLinkObject(%ws) failed. Status is %ws\n", _SymbolicLinkName, MapNTStatus(status)));
 				break;
 			}
 
@@ -148,7 +148,7 @@ public:
 
 			if (!NT_SUCCESS(status))
 			{
-				KdPrint(("FileMonQuerySymbolicLink.ZwQuerySymbolicLinkObject %ws\n", MapNTStatus(status)));
+				KdPrint(("Function FileMonQuerySymbolicLink call ZwQuerySymbolicLinkObject(%ws) failed. Status is %ws\n", _SymbolicLinkName, MapNTStatus(status)));
 				ASSERT(FALSE);
 			}
 		} while (FALSE);

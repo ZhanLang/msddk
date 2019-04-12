@@ -2,11 +2,14 @@
 #include "types.h"
 #include"memory.h"
 
-
 namespace msddk{;
 
+#ifndef STR_PAGED_CODE
+#define STR_PAGED_CODE() ASSERT( Assert() );
+#endif
 struct StrPageMem : public PagedObject{
 	VOID* Malloc(size_t size){
+		PAGED_CODE();
 		VOID* p = ExAllocatePoolWithTag(PagedPool, size, 'SPag');
  		if ( p )
  			memset(p, 0, size);
@@ -14,9 +17,17 @@ struct StrPageMem : public PagedObject{
 		return p;
 	}
 	VOID Free(VOID* lpVoid){
+		PAGED_CODE();
 		if (lpVoid)
 			ExFreePoolWithTag(lpVoid, 'SPag');
 	}
+
+	BOOL Assert() const{
+		if ( KeGetCurrentIrql() == DISPATCH_LEVEL)
+			return FALSE;
+		return TRUE;
+	}
+
 };
 
 struct StrNonPageMem : public NonPagedObject{
@@ -29,6 +40,9 @@ struct StrNonPageMem : public NonPagedObject{
 	VOID Free(VOID* lpVoid){
 		if (lpVoid)
 			ExFreePoolWithTag(lpVoid, 'SNPa');
+	}
+	BOOL Assert() const{
+		return TRUE;
 	}
 };
 
@@ -184,12 +198,14 @@ typedef CKeStringBase<wchar_t, UNICODE_STRING, StrPageMem>CKePageStringW;
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>::CKeStringBase() : _chars(0), _length(0) , _capacity(0) 
 { 
-		SetCapacity(3); 
+	STR_PAGED_CODE()
+	SetCapacity(3); 
 }
 
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>::CKeStringBase(T c):  _chars(0), _length(0), _capacity(0)
 {
+	STR_PAGED_CODE()
 	memset(&_ntStr, 0, sizeof(_ntStr));
 	SetCapacity(1);
 	_chars[0] = c;
@@ -201,6 +217,7 @@ CKeStringBase<T,NTStr,M>::CKeStringBase(T c):  _chars(0), _length(0), _capacity(
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>::CKeStringBase(const T *chars): _chars(0), _length(0), _capacity(0)
 {
+	STR_PAGED_CODE()
 	memset(&_ntStr, 0, sizeof(_ntStr));
 	if (chars)
 	{
@@ -215,6 +232,7 @@ CKeStringBase<T,NTStr,M>::CKeStringBase(const T *chars): _chars(0), _length(0), 
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>::CKeStringBase(const CKeStringBase &s):  _chars(0), _length(0), _capacity(0)
 {
+	STR_PAGED_CODE()
 	memset(&_ntStr, 0, sizeof(_ntStr));
 	SetCapacity(s._length);
 	StringCopy(_chars, s._chars);
@@ -224,6 +242,7 @@ CKeStringBase<T,NTStr,M>::CKeStringBase(const CKeStringBase &s):  _chars(0), _le
 template<typename T, typename NTStr, typename M /*= StrPageMem*/>
 msddk::CKeStringBase<T, NTStr, M>::CKeStringBase(const PNTStr &ntStr)
 {
+	STR_PAGED_CODE()
 	memset(&_ntStr, 0, sizeof(_ntStr));
 	if (ntStr && ntStr->Buffer && ntStr->Length)
 	{
@@ -237,6 +256,7 @@ msddk::CKeStringBase<T, NTStr, M>::CKeStringBase(const PNTStr &ntStr)
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>::~CKeStringBase() 
 {  
+	STR_PAGED_CODE()
 	delete []_chars;
 	_chars = NULL;
 }
@@ -245,24 +265,28 @@ CKeStringBase<T,NTStr,M>::~CKeStringBase()
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>::operator const T*() const 
 { 
+	STR_PAGED_CODE()
 	return _chars;
 }
 
 template<typename T,typename NTStr,typename M>
 T CKeStringBase<T,NTStr,M>::Back() const 
 { 
+	STR_PAGED_CODE()
 	return _chars[_length - 1]; 
 }
 
 template<typename T,typename NTStr,typename M>
 T* CKeStringBase<T,NTStr,M>::GetBuffer()
 {
+	STR_PAGED_CODE()
 	return _chars;
 }
 
 template<typename T,typename NTStr,typename M>
 T* CKeStringBase<T,NTStr,M>::GetBufferSetLength(int minBufLenght)
 {
+	STR_PAGED_CODE()
 	if (minBufLenght >= _capacity)
 	{
 		SetCapacity(minBufLenght);
@@ -275,12 +299,14 @@ T* CKeStringBase<T,NTStr,M>::GetBufferSetLength(int minBufLenght)
 template<typename T,typename NTStr,typename M>
 void CKeStringBase<T, NTStr,M>::ReleaseBuffer() 
 { 
+	STR_PAGED_CODE()
 	ReleaseBuffer(StringLen(_chars));
 }
 
 template<typename T,typename NTStr,typename M>
 void CKeStringBase<T, NTStr,M>::ReleaseBuffer(int newLength)
 {
+	STR_PAGED_CODE()
 	_chars[newLength] = 0;
 	_length = newLength;
 }
@@ -288,6 +314,7 @@ void CKeStringBase<T, NTStr,M>::ReleaseBuffer(int newLength)
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator=(T c)
 {
+	STR_PAGED_CODE()
 	Empty();
 	SetCapacity(1);
 	_chars[0] = c;
@@ -299,6 +326,7 @@ CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator=(T c)
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator=(const T *chars)
 {
+	STR_PAGED_CODE()
 	Empty();
 	if ( chars )
 	{
@@ -314,6 +342,7 @@ CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator=(const T *chars)
 template<typename T, typename NTStr, typename M>
 CKeStringBase<T, NTStr,M>& CKeStringBase<T, NTStr,M>::operator=(const PNTStr ntStr)
 {
+	STR_PAGED_CODE()
 	Empty();
 	if (ntStr && ntStr->Buffer && ntStr->Length)
 	{
@@ -329,6 +358,7 @@ CKeStringBase<T, NTStr,M>& CKeStringBase<T, NTStr,M>::operator=(const PNTStr ntS
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator=(const CKeStringBase<T,NTStr,M>& s)
 {
+	STR_PAGED_CODE()
 	if (&s == this)
 		return *this;
 	Empty();
@@ -341,6 +371,7 @@ CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator=(const CKeStringBas
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator+=(T c)
 {
+	STR_PAGED_CODE()
 	GrowLength(1);
 	_chars[_length] = c;
 	_chars[++_length] = 0;
@@ -351,6 +382,7 @@ CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator+=(T c)
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator+=(const T *s)
 {
+	STR_PAGED_CODE()
 	if ( s )
 	{
 		int len = StringLen(s);
@@ -365,6 +397,7 @@ CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator+=(const T *s)
 template<typename T, typename NTStr, typename M>
 CKeStringBase<T, NTStr,M>::operator const PNTStr()
 {
+	STR_PAGED_CODE()
 	_ntStr.Length = (USHORT)(_length * sizeof(T));
 	_ntStr.MaximumLength = (USHORT)(_capacity * sizeof(T));
 	_ntStr.Buffer = _chars;
@@ -374,6 +407,7 @@ CKeStringBase<T, NTStr,M>::operator const PNTStr()
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator+=(const CKeStringBase<T,NTStr,M> &s)
 {
+	STR_PAGED_CODE()
 	if ( s.Length() )
 	{
 		GrowLength(s._length);
@@ -387,6 +421,7 @@ CKeStringBase<T,NTStr,M>& CKeStringBase<T,NTStr,M>::operator+=(const CKeStringBa
 template<typename T, typename NTStr, typename M /*= StrPageMem*/>
 CKeStringBase<T, NTStr, M>& msddk::CKeStringBase<T, NTStr, M>::operator+=(const PNTStr &ntStr)
 {
+	STR_PAGED_CODE()
 	if (ntStr && ntStr->Buffer && ntStr->Length)
 	{
 		int length = ntStr->Length / sizeof(T);
@@ -402,12 +437,14 @@ CKeStringBase<T, NTStr, M>& msddk::CKeStringBase<T, NTStr, M>::operator+=(const 
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M> CKeStringBase<T,NTStr,M>::Mid(int startIndex) const
 { 
+	STR_PAGED_CODE()
 	return Mid(startIndex, _length - startIndex); 
 }
 
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M> CKeStringBase<T,NTStr,M>::Mid(int startIndex, int count) const
 {
+	STR_PAGED_CODE()
 	if (startIndex + count > _length)
 		count = _length - startIndex;
 
@@ -431,6 +468,7 @@ CKeStringBase<T,NTStr,M> CKeStringBase<T,NTStr,M>::Mid(int startIndex, int count
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M> CKeStringBase<T,NTStr,M>::Left(int count) const
 { 
+	STR_PAGED_CODE()
 	return Mid(0, count); 
 }
 
@@ -438,6 +476,7 @@ CKeStringBase<T,NTStr,M> CKeStringBase<T,NTStr,M>::Left(int count) const
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M> CKeStringBase<T,NTStr,M>::Right(int count) const
 {
+	STR_PAGED_CODE()
 	if (count > _length)
 		count = _length;
 	return Mid(_length - count, count);
@@ -446,6 +485,7 @@ CKeStringBase<T,NTStr,M> CKeStringBase<T,NTStr,M>::Right(int count) const
 template<typename T,typename NTStr,typename M>
 void CKeStringBase<T, NTStr,M>::MakeUpper() 
 { 
+	STR_PAGED_CODE()
 	for (int i = 0; i <= _length; i++)
 		_chars[i] = CharUpper(_chars[i]);
 }
@@ -453,6 +493,7 @@ void CKeStringBase<T, NTStr,M>::MakeUpper()
 template<typename T,typename NTStr,typename M>
 void CKeStringBase<T, NTStr,M>::MakeLower() 
 { 
+	STR_PAGED_CODE()
 	for (int i = 0; i <= _length; i++)
 		_chars[i] = CharLower(_chars[i]);
 }
@@ -460,18 +501,21 @@ void CKeStringBase<T, NTStr,M>::MakeLower()
 template<typename T,typename NTStr,typename M>
 int CKeStringBase<T,NTStr,M>::Compare(const CKeStringBase& s) const
 { 
+	STR_PAGED_CODE()
 	return StringCompare(_chars, s._chars); 
 }
 
 template<typename T,typename NTStr,typename M>
 int CKeStringBase<T,NTStr,M>::Compare(const T *s) const
 { 
+	STR_PAGED_CODE()
 	return StringCompare(_chars, s); 
 }
 
 template<typename T,typename NTStr,typename M>
 int CKeStringBase<T,NTStr,M>::CompareNoCase(const CKeStringBase& s) const
 { 
+	STR_PAGED_CODE()
 	return StringCompareNoCase(_chars, s._chars); 
 }
 
@@ -479,6 +523,7 @@ int CKeStringBase<T,NTStr,M>::CompareNoCase(const CKeStringBase& s) const
 template<typename T,typename NTStr,typename M>
 int CKeStringBase<T,NTStr,M>::CompareNoCase(const T *s) const
 { 
+	STR_PAGED_CODE()
 	return StringCompareNoCase(_chars, s); 
 }
 
@@ -491,6 +536,7 @@ int CKeStringBase<T,NTStr,M>::Find(T c) const
 template<typename T,typename NTStr,typename M>
 int CKeStringBase<T,NTStr,M>::Find(T c, int startIndex) const
 {
+	STR_PAGED_CODE()
 	const T *p = _chars + startIndex;
 	for (;;)
 	{
@@ -530,6 +576,7 @@ int CKeStringBase<T,NTStr,M>::Find(const CKeStringBase<T,NTStr,M> &s, int startI
 template<typename T,typename NTStr,typename M>
 int CKeStringBase<T,NTStr,M>::ReverseFind(T c) const
 {
+	STR_PAGED_CODE()
 	if (_length == 0)
 		return -1;
 
@@ -655,6 +702,7 @@ int CKeStringBase<T,NTStr,M>::Format(const T* pstrFormat, ...)
 template<typename T,typename NTStr,typename M>
 int CKeStringBase<T,NTStr,M>::FormatV(const char* pszFormat, va_list args )
 {
+	STR_PAGED_CODE()
 	char* szSprintf = NULL;
 	int nLen = 0;
 	nLen = ::_vsnprintf(NULL, 0, pszFormat, args);
@@ -669,15 +717,16 @@ int CKeStringBase<T,NTStr,M>::FormatV(const char* pszFormat, va_list args )
 template<typename T,typename NTStr,typename M>
 int CKeStringBase<T,NTStr,M>::FormatV(const wchar_t * pszFormat, va_list args )
 {
+	STR_PAGED_CODE()
 	wchar_t* szSprintf = NULL;
 	int nLen = 0;
 	nLen = ::_vsnwprintf(NULL, 0, pszFormat, args);
-	szSprintf = (wchar_t*) AllocMem()((nLen + 1)*sizeof(wchar_t));
+	szSprintf = (wchar_t*)Malloc((nLen + 1)*sizeof(wchar_t));
 	memset(szSprintf, 0, (nLen + 1) * sizeof(wchar_t));
 	int iRet = ::_vsnwprintf(szSprintf, nLen + 1, pszFormat, args);
 	Empty();
 	Insert(0,szSprintf);
-	FreeMem()(szSprintf);
+	Free(szSprintf);
 	return iRet;
 }
 
@@ -697,6 +746,7 @@ int CKeStringBase<T,NTStr,M>::AppendFormat(const T* pstrFormat, ...)
 template<typename T,typename NTStr,typename M>
 void CKeStringBase<T, NTStr,M>::Empty()
 {
+	STR_PAGED_CODE()
 	_length = 0;
 	if (_chars) _chars[0] = 0;
 }
@@ -760,6 +810,7 @@ int CKeStringBase<T,NTStr,M>::Replace(const CKeStringBase<T,NTStr,M> &oldString,
 template<typename T,typename NTStr,typename M>
 int CKeStringBase<T,NTStr,M>::Delete(int index, int count)
 {
+	STR_PAGED_CODE()
 	if (index + count > _length)
 		count = _length - index;
 	if (count > 0)
@@ -902,6 +953,7 @@ inline const T* CKeStringBase<T,NTStr,M>::GetPrevCharPointer(const T *, const T 
 template<typename T,typename NTStr,typename M>
 inline void CKeStringBase<T, NTStr,M>::SetCapacity(int newCapacity)
 {
+	STR_PAGED_CODE()
 	int realCapacity = newCapacity + 1;
 	if (realCapacity <= _capacity)
 		return;
@@ -922,6 +974,7 @@ inline void CKeStringBase<T, NTStr,M>::SetCapacity(int newCapacity)
 template<typename T,typename NTStr,typename M>
 void CKeStringBase<T, NTStr,M>::MoveItems(int destIndex, int srcIndex)
 {
+	STR_PAGED_CODE()
 	memmove(_chars + destIndex, _chars + srcIndex,sizeof(T) * (_length - srcIndex + 1));
 }
 
@@ -1010,6 +1063,7 @@ inline int CKeStringBase<T,NTStr,M>::StringCompareNoCase(const T *s1, const T *s
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M> operator+(const CKeStringBase<T,NTStr,M>& s1, const CKeStringBase<T,NTStr,M>& s2)
 {
+	STR_PAGED_CODE()
 	CKeStringBase<T,NTStr,M> result(s1);
 	result += s2;
 	return result;
@@ -1018,6 +1072,7 @@ CKeStringBase<T,NTStr,M> operator+(const CKeStringBase<T,NTStr,M>& s1, const CKe
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M> operator+(const CKeStringBase<T,NTStr,M>& s, T c)
 {
+	STR_PAGED_CODE()
 	CKeStringBase<T,NTStr,M> result(s);
 	result += c;
 	return result;
@@ -1026,6 +1081,7 @@ CKeStringBase<T,NTStr,M> operator+(const CKeStringBase<T,NTStr,M>& s, T c)
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M> operator+(T c, const CKeStringBase<T,NTStr,M>& s)
 {
+	STR_PAGED_CODE()
 	CKeStringBase<T,NTStr,M> result(c);
 	result += s;
 	return result;
@@ -1034,6 +1090,7 @@ CKeStringBase<T,NTStr,M> operator+(T c, const CKeStringBase<T,NTStr,M>& s)
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M> operator+(const CKeStringBase<T,NTStr,M>& s, const T * chars)
 {
+	STR_PAGED_CODE()
 	CKeStringBase<T,NTStr,M> result(s);
 	result += chars;
 	return result;
@@ -1042,6 +1099,7 @@ CKeStringBase<T,NTStr,M> operator+(const CKeStringBase<T,NTStr,M>& s, const T * 
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M> operator+(const T * chars, const CKeStringBase<T,NTStr,M>& s)
 {
+	STR_PAGED_CODE()
 	CKeStringBase<T,NTStr,M> result(chars);
 	result += s;
 	return result;
@@ -1050,42 +1108,49 @@ CKeStringBase<T,NTStr,M> operator+(const T * chars, const CKeStringBase<T,NTStr,
 template<typename T,typename NTStr,typename M>
 bool operator==(const CKeStringBase<T,NTStr,M>& s1, const CKeStringBase<T,NTStr,M>& s2)
 { 
+	STR_PAGED_CODE()
 	return (s1.Compare(s2) == 0); 
 }
 
 template<typename T,typename NTStr,typename M>
 bool operator<(const CKeStringBase<T,NTStr,M>& s1, const CKeStringBase<T,NTStr,M>& s2)
 { 
+	STR_PAGED_CODE()
 	return (s1.Compare(s2) < 0); 
 }
 
 template<typename T,typename NTStr,typename M>
 bool operator==(const T *s1, const CKeStringBase<T,NTStr,M>& s2)
 { 
+	STR_PAGED_CODE()
 	return (s2.Compare(s1) == 0); 
 }
 
 template<typename T,typename NTStr,typename M>
 bool operator==(const CKeStringBase<T,NTStr,M>& s1, const T *s2)
 {
+	STR_PAGED_CODE()
 	return (s1.Compare(s2) == 0); 
 }
 
 template<typename T,typename NTStr,typename M>
 bool operator!=(const CKeStringBase<T,NTStr,M>& s1, const CKeStringBase<T,NTStr,M>& s2)
 { 
+	STR_PAGED_CODE()
 	return (s1.Compare(s2) != 0);
 }
 
 template<typename T,typename NTStr,typename M>
 bool operator!=(const T *s1, const CKeStringBase<T,NTStr,M>& s2)
 { 
+	STR_PAGED_CODE()
 	return (s2.Compare(s1) != 0);
 }
 
 template<typename T,typename NTStr,typename M>
 bool operator!=(const CKeStringBase<T,NTStr,M>& s1, const T *s2)
 { 
+	STR_PAGED_CODE()
 	return (s1.Compare(s2) != 0);
 }
 
