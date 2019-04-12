@@ -20,6 +20,12 @@ public:
 		POBJECT_NAME_INFORMATION lpName = NULL;
 		CKePageStringW NtFileName = _NtFileName;
 
+		if (NtFileName.Compare(L"System") == 0 ||
+			NtFileName.Compare(L"Registry") == 0)
+		{
+			DosFileName = NtFileName;
+			return status;
+		}
 
 		do 
 		{
