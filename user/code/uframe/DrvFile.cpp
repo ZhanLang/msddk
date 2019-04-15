@@ -22,8 +22,8 @@ CDrvFile::~CDrvFile(void)
 HRESULT CDrvFile::DeviceIoControl(DWORD dwIoControlCode,LPVOID lpInBuffer,DWORD nInBufferSize,LPVOID lpOutBuffer, DWORD nOutBufferSize,LPDWORD lpBytesReturned)
 {
 	if ( m_hFile == INVALID_HANDLE_VALUE)
-		return ERROR_INVALID_HANDLE;
-	
+		return E_HANDLE;
+
 	BOOL bRet = ::DeviceIoControl(m_hFile, dwIoControlCode, lpInBuffer, nInBufferSize, lpOutBuffer, nOutBufferSize, lpBytesReturned, NULL);
 	if ( bRet )
 		return S_OK;
