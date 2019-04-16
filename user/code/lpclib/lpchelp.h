@@ -67,8 +67,12 @@ public:
 #endif // _WIN64
 		
 		m_hModule = ::LoadLibrary( szModulePath );
-		if ( !m_hModule )
+		if (!m_hModule)
+		{
+			MessageBox(NULL, szModulePath, L"Can not load library", MB_OK);
 			return FALSE;
+		}
+			
 
 		m_p_lpc_server_create	= (p_lpc_server_create)GetProcAddress(m_hModule,"lpc_server_create");
 		m_p_lpc_server_close	= (p_lpc_server_close)GetProcAddress(m_hModule,"lpc_server_close");

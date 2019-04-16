@@ -165,6 +165,10 @@
       <AdditionalDependencies>ntdll_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>def.def</ModuleDefinitionFile>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='64_32_Debug|Win32'">
     <ClCompile>
@@ -181,6 +185,10 @@
       <AdditionalDependencies>ntdll_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>def.def</ModuleDefinitionFile>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -234,6 +242,10 @@
       <AdditionalDependencies>ntdll_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>def.def</ModuleDefinitionFile>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='64_32_Release|Win32'">
     <ClCompile>
@@ -255,6 +267,10 @@
       <AdditionalDependencies>ntdll_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>def.def</ModuleDefinitionFile>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -276,6 +292,9 @@
       <AdditionalDependencies>ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>def.def</ModuleDefinitionFile>
     </Link>
+    <PreBuildEvent>
+      <Command>$(msddk)\user\tools\AutoVersion.exe $(ProjectDir)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='64_32_Release|x64'">
     <ClCompile>
@@ -307,6 +326,7 @@
     <ClInclude Include="ftlThread.h" />
     <ClInclude Include="ftlThreadPool.h" />
     <ClInclude Include="ftlThreadPool.hpp" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="server.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -350,6 +370,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='64_32_Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ulpc.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ulpc.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -60,7 +60,8 @@
       <AdditionalLibraryDirectories>$(msddk)\user\bin</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>AutoVersion.exe</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -82,7 +83,7 @@
       <AdditionalLibraryDirectories>$(msddk)\user\bin</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>AutoVersion.exe</Command>
+      <Command>$(msddk)\user\tools\AutoVersion.exe $(ProjectDir)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
