@@ -8,20 +8,20 @@ enum EventType
 	kAutoResetEvent,
 };
 
-class CKeEvent:NonPagedObject
+class CKeEvent : public NonPagedObject
 {
 private:
 	KEVENT * m_pEvent;
 public:
 	CKeEvent(EVENT_TYPE Type, bool State = false)
 	{
-		m_pEvent = (KEVENT *)npagednew(sizeof(KEVENT));
+		m_pEvent = new KEVENT;
 		KeInitializeEvent(m_pEvent, Type, State);
 	}
 public:
 	CKeEvent(bool initialState = false, EventType eventType = kManualResetEvent)
 	{
-		m_pEvent = (KEVENT *)npagednew(sizeof(KEVENT));
+		m_pEvent = new KEVENT;
 		C_ASSERT(NotificationEvent == kManualResetEvent);
 		C_ASSERT(SynchronizationEvent == kAutoResetEvent);
 		KeInitializeEvent(m_pEvent, (EVENT_TYPE)eventType, initialState);

@@ -19,6 +19,19 @@
 #include <kprocess/procapi.h>
 using namespace msddk;
 CKeLogWorker* pLogWorker;
+
+class CMemTest : public NonPagedObject
+{
+public:
+	CMemTest()
+	{
+		KdPrint(("CMemTest\n"));
+	}
+	~CMemTest()
+	{
+		KdPrint(("~CMemTest\n"));
+	}
+};
 class MyDevicer : public CUnknownDevcie 
 {
 public:
@@ -43,9 +56,6 @@ public:
 
 	virtual NTSTATUS OnAfterCreate()
 	{
-
-		
-
 		NTSTATUS st = STATUS_SUCCESS;
 		KdPrint(("OnAfterCreate"));
 

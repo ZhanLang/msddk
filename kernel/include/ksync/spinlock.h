@@ -1,7 +1,7 @@
 #pragma once
 namespace msddk { ;
 
-class CKeSpinLock
+class CKeSpinLock : public NonPagedObject
 {
 private:
 	KSPIN_LOCK m_SpinLock;
@@ -37,12 +37,6 @@ public:
 		m_bHeld = false;
 #endif
 		KeReleaseSpinLock(&m_SpinLock, m_OwnerIrql);
-	}
-
-public:
-	void *operator new(size_t size)
-	{
-		return npagednew(size);
 	}
 };
 

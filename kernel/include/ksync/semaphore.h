@@ -1,7 +1,7 @@
 #pragma once
 namespace msddk { ;
 
-class CKeSemaphore
+class CKeSemaphore : public NonPagedObject
 {
 private:
 	PKSEMAPHORE m_pSemaphore;
@@ -10,7 +10,7 @@ public:
 	{
 		ASSERT(InitialCount >= 0);
 		ASSERT(Limit > 0);
-		m_pSemaphore = (PKSEMAPHORE)npagednew(sizeof(KSEMAPHORE));
+		m_pSemaphore = new KSEMAPHORE;
 		if (m_pSemaphore)
 			KeInitializeSemaphore(m_pSemaphore, InitialCount, Limit);
 	}

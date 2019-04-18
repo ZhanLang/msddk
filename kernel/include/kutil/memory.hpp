@@ -1,44 +1,27 @@
 
 #include "memory.h"
 
-
 void * __cdecl operator new(size_t size)
 {
-	return ExAllocatePoolWithTag(NonPagedPool, size, 'WENB');
+	return msddk::npaged_new(size);
 }
 
 void __cdecl operator delete(void *ptr, size_t)
 {
-	if (ptr)
-	{
-		ExFreePoolWithTag(ptr, 'WENB');
-	}
+	msddk::npaged_delete(ptr);
 }
 
  void * __cdecl operator new[](size_t size)
 {
-	return ExAllocatePoolWithTag(NonPagedPool, size, 'WENB');
+	 return msddk::npaged_new(size);
 }
 
 void __cdecl operator delete[](void *ptr)
 {
-	if (ptr)
-	{
-		ExFreePoolWithTag(ptr, 'WENB');
-	}
-	else
-	{
-		KdPrint(("msddk::kmemory::operator delete[](null)\n"));
-	}
-	
+	msddk::npaged_delete(ptr);
 }
 
 void __cdecl operator delete[](void *ptr, size_t)
 {
-	if (ptr)
-		ExFreePoolWithTag(ptr, 'WENB');
-	else
-	{
-		KdPrint(("msddk::kmemory::operator delete[](null,0)\n"));
-	}
+	msddk::npaged_delete(ptr);
 }
