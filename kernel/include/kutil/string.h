@@ -256,8 +256,9 @@ msddk::CKeStringBase<T, NTStr, M>::CKeStringBase(const PNTStr &ntStr)
 template<typename T,typename NTStr,typename M>
 CKeStringBase<T,NTStr,M>::~CKeStringBase() 
 {  
-	STR_PAGED_CODE()
-	delete []_chars;
+	STR_PAGED_CODE();
+	Empty();
+	Free(_chars);
 	_chars = NULL;
 }
 
